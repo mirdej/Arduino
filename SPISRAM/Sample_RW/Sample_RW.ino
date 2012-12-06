@@ -18,12 +18,8 @@ SPISRAM myRAM(SRAM_CS, SPISRAM::BUS_MBits); // CS pin
 char buffer[128];
 
 void setup() {
-//  pinMode(11, OUTPUT);
-//  digitalWrite(11, HIGH);
-  pinMode(4, OUTPUT);
-  digitalWrite(4, HIGH);
   
-  Serial.begin(57600);
+  Serial.begin(38400);
   
   SPI.begin();
   myRAM.begin();
