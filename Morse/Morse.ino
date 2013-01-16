@@ -72,7 +72,7 @@ char codetable[][8] = {
 
 int LED13 = 13;
 int PIEZZO = 7;
-long duration1dot = 75; // in millisecs.
+long duration1dot = 60; // in millisecs.
 
 void signal(int length) {
   if ( length ) {
@@ -83,7 +83,7 @@ void signal(int length) {
     noTone(PIEZZO);
     delay(duration1dot);
   } else {
-    delay(3 * duration1dot);
+    delay(1 * duration1dot);
   }
 }
 
@@ -103,7 +103,10 @@ void loop() {
   char rx;
   while ( Serial.available() ) {
     rx = toupper((char) Serial.read());
-    if ( rx < ' ' || rx > '_' )
+    if (rx == '\n') {
+      Serial.println();
+      continue;
+    } else if ( rx < ' ' || rx > '_' )
       continue;
     codenum = rx - ' '; 
     for ( i = 0; codetable[codenum][i] != 0 ; i++) {
