@@ -81,20 +81,19 @@ void signal(int length) {
     delay(length * duration1dot);
     digitalWrite(LED13, LOW);
     noTone(PIEZZO);
-    delay(duration1dot);
-  } else {
-    delay(1 * duration1dot);
   }
+  delay(duration1dot);
 }
 
 void setup() {                
   // initialize the digital pin as an output.
-  // Pin 13 has an LED connected on most Arduino boards:
+  // Pin 13 has an LED connected on most Arduino boards.
+  // Connect Piezzo Speaker between Pin 7 and GND,
   pinMode(LED13, OUTPUT);
   pinMode(PIEZZO, OUTPUT);
 
   Serial.begin(9600);
-  Serial.println();
+  Serial.println("Type and send message.");
 }
 
 void loop() {
@@ -106,9 +105,9 @@ void loop() {
     if (rx == '\n') {
       Serial.println();
       continue;
-    } else if ( rx < ' ' || rx > '_' )
+    } else if ( rx < ' ' || rx > '_' ) // ignore
       continue;
-    codenum = rx - ' '; 
+    codenum = rx - ' ';
     for ( i = 0; codetable[codenum][i] != 0 ; i++) {
       switch(codetable[codenum][i]) {
       case '1':
