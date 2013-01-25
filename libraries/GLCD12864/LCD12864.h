@@ -65,9 +65,9 @@ byte checkAND[8];
 byte delaytime;
 byte DEFAULTTIME;
 
-static const byte RS = 17; 
-static const byte RW = 16;  
-static const byte EN = 18;  
+static const byte RS = 14;
+static const byte RW = 15;
+static const byte EN = 16;
 static const byte D0  = 8;  
 static const byte D1  = 9; 
 static const byte D2  = 10;  
@@ -76,7 +76,8 @@ static const byte D4  = 4;
 static const byte D5  = 5;  
 static const byte D6  = 6;  
 static const byte D7  = 7; 
-static const byte CSEL1  = 14; 
+static const byte CSEL1  = 11;
+static const byte CSEL2  = 12;
 
 
 

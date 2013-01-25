@@ -16,8 +16,12 @@ Other than that, enjoy... =D
 #include "LCD12864.h"
 #include "LCDSprite.h"
 
-extern "C" {
+#if ARDUINO >= 100
+#include <Arduino.h>
+#else
 #include <wiring.h> 
+#endif
+extern "C" {
 #include <inttypes.h>
 #include <avr/pgmspace.h>
 }
