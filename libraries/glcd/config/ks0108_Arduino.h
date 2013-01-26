@@ -33,8 +33,8 @@
  * default assignment uses the first five analog pins
  */
 
-#define glcdCSEL1        14
-#define glcdCSEL2        15
+#define glcdCSEL1        12
+#define glcdCSEL2        13
 
 #if NBR_CHIP_SELECT_PINS > 2
 #define glcdCSEL3         3   // third chip select if needed
@@ -44,9 +44,9 @@
 #define glcdCSEL4         2   // fourth chip select if needed
 #endif
 
-#define glcdRW           16
-#define glcdDI           17
-#define glcdEN           18
+#define glcdRW           15
+#define glcdDI           14 // RS
+#define glcdEN           16
 // Reset Bit  - uncomment the next line if reset is connected to an output pin
 //#define glcdRES          19    // Reset Bit
 
