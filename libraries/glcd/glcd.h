@@ -35,9 +35,7 @@
 #define GLCD_H
 
 #include <inttypes.h>
-#ifdef __GCC_AVR__
 #include <avr/pgmspace.h>
-#endif
 
 #include "include/gText.h" 
 

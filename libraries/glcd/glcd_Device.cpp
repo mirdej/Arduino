@@ -24,8 +24,8 @@
 
 */
 
-#include "Controller.h"
-#include "Controller_io_defs.h"
+#include "include/glcd_Device.h"
+#include "include/glcd_io.h"
 #include "include/glcd_errno.h"
 
 

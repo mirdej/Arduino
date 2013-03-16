@@ -30,11 +30,9 @@
   
 */
 
-#ifdef __GCC_AVR__
 #include <avr/pgmspace.h>
-#endif
 #include "glcd.h"
-#include "glcd_defs.h"
+#include "glcd_Config.h" 
 
 #define BITMAP_FIX // enables a bitmap rendering fix/patch
 
@@ -727,12 +725,12 @@ uint8_t y = radius;
 //
 // Font Functions
 //
-#ifdef __GCC_AVR__
+
 uint8_t ReadPgmData(const uint8_t* ptr)  // note this is a static function
 {  // note this is a static function
 	return pgm_read_byte(ptr);
 }
-#endif
+
 /*
  * Below here are text wrapper functions
  */
