@@ -4,21 +4,24 @@ const int TUBE_PIN = 2;
 const int DEFAULTLED_PIN = 13;
 
 
-long watch, triggered;
-long count;
+long watch, secs, triggered;
+long count[12];
 
 void setup() {
   Serial.begin(9600);
-  Serial.println("Hi.");
+  Serial.println(0);
   
   pinMode(BUZZ_PIN, OUTPUT);
   pinMode(TUBE_PIN, INPUT);
   pinMode(DEFAULTLED_PIN, OUTPUT);
   digitalWrite(DEFAULTLED_PIN, LOW);
   
+  for(int i = 0; i < 12; i++) {
+    count[i] = 0;
+  }
   tone(7, 2000, 200);
   watch = millis();
-  count = 0;
+  secs = millis()/1000;
 }
 
 
@@ -27,18 +30,21 @@ void loop() {
     triggered = micros();
     digitalWrite(DEFAULTLED_PIN, HIGH);
     tone(BUZZ_PIN, 3300, 20);
-    count++;
+    count[millis()/1000 / 5 % 12]++;
     while ( triggered + 20 > micros() && digitalRead(TUBE_PIN) == LOW);
   }
   if ( digitalRead(DEFAULTLED_PIN) == HIGH && micros() > triggered + 5000 )
       digitalWrite(DEFAULTLED_PIN, LOW);
-  if ( millis() > watch + 59999 ) {
-    watch = millis();
-    Serial.print(millis()/1000);
-    Serial.print(": ");
-    Serial.print(count);
-    Serial.println(" count per min.");
-    count = 0;
+  if (secs != millis()/1000) {
+    if ( secs / 5 %12 == 0 ) {
+      long sum =0;
+      for(int i = 0; i < 12; i++) {
+        sum += count[i];
+      }
+      Serial.println(sum);
+      count[secs/5 % 12] = 0;
+    }
+    secs = millis()/1000;
   }
 }
 
