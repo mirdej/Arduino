@@ -11,7 +11,7 @@ char buffer[16];
 
 void setup() {
   byte not_used_cs[] = { 
-    4, 9, 10 
+    4, 7, 8, 9, 10 
   };
   for (int i = 0; i < sizeof(not_used_cs); i++) {
     pinMode(not_used_cs[i], OUTPUT);
