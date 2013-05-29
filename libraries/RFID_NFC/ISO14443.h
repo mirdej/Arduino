@@ -122,7 +122,7 @@ struct ISO14443 : public Printable {
 			break;
 		default:
 			cnt += pr.print("Unknown (");
-			cnt += pr.print(type, DEC);
+			cnt += pr.print((int)type, DEC);
 			cnt += pr.print(")");
 			break;
 		}

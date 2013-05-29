@@ -15,6 +15,13 @@ void TextStream::printHex(const byte b) {
 	stream->write( ((b & 0x0f) < 0x0a ? '0' : 'A'-10 ) + (b&0x0f) );
 }
 
+size_t TextStream::print(unsigned char val, int base) {
+	if ( base != HEX)
+		return Print::print(val, base);
+	printHex(val);
+	return 2;
+}
+
 void TextStream::printBytes(const byte * a, const int length, const char * gap,
 		byte base) {
 

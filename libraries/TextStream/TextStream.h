@@ -36,7 +36,7 @@ public:
 	}
     ~TextStream() { }
 
-    void resetTo(Stream & s) { stream = &s; }
+    void streamOn(Stream & s) { stream = &s; }
 
     virtual int available() { return stream->available(); }
     virtual int read() { return stream->read(); }
@@ -48,8 +48,10 @@ public:
     int getToken(char * buf, size_t maxlen);
     inline void skipLine() { getLine(0, 0); }
     inline void skipToken() { getToken(0,0); }
-
     uint32_t parseHex();
+
+    using Print::print;
+    size_t print(unsigned char val, int base = HEX);
 
 	void printHex(const byte b);
     void printBytes(const byte * a, const int length, const char * gap = 0, byte base = HEX);
