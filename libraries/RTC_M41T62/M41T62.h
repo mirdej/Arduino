@@ -84,6 +84,7 @@ public:
 	}
 //		static int base_year() { return DS1307_BASE_YR; }
 
+	void update() { updateCalendar(); updateTime(); }
 	void updateTime();
 	void updateCalendar();
 //		byte* getTimestamp(byte* );

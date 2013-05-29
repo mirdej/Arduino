@@ -176,6 +176,11 @@ public:
 	boolean GetGeneralStatus();
 	boolean SAMConfiguration(byte mode = 0x01, byte timeout = 0x14, byte use_irq =
 			0x01);
+	// 01 normal mode (default), SAM is not used.
+	// timeout value in virtual card mode, x 50ms.
+	// x01 P70_IRQ is driven by PN532
+	// response has no value, only with answer header d5 and command response code 15.
+
 	boolean PowerDown(byte wkup, byte genirq = 0x01);
 	boolean WriteRegister(word addr, byte value);
 	inline boolean CPU_PowerMode(const byte mode = 0x00) {

@@ -28,8 +28,8 @@ class TextStream : public Stream {
 public:
 	static const char endl = '\n';
 	static const char cr = '\r';
-	static const char * wendl;
 	static const char tab = '\t';
+	static const char * wendl;
 
 	TextStream(void) : stream(0){}
     TextStream(Stream & s) : stream(&s) {
@@ -52,8 +52,8 @@ public:
     uint32_t parseHex();
 
 	void printHex(const byte b);
-    void printBytes(const byte * a, const int length, const char gap, byte base);
-    void printBytes(const char * s, const int length, const char gap);
+    void printBytes(const byte * a, const int length, const char * gap = 0, byte base = HEX);
+    void printBytes(const char * s, const int length, const char * gap = 0);
 
 };
 

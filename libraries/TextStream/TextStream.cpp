@@ -15,7 +15,7 @@ void TextStream::printHex(const byte b) {
 	stream->write( ((b & 0x0f) < 0x0a ? '0' : 'A'-10 ) + (b&0x0f) );
 }
 
-void TextStream::printBytes(const byte * a, const int length, const char gap,
+void TextStream::printBytes(const byte * a, const int length, const char * gap,
 		byte base) {
 
 	for (int i = 0; i < length;) {
@@ -37,7 +37,7 @@ void TextStream::printBytes(const byte * a, const int length, const char gap,
 	return;
 }
 
-void TextStream::printBytes(const char * s, const int length, const char gap) {
+void TextStream::printBytes(const char * s, const int length, const char * gap) {
 	for (int i = 0; i < length;) {
 		if (isprint(s[i]))
 			stream->print(s[i]);

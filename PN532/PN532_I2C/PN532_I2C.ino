@@ -1,8 +1,9 @@
 #include <Wire.h>
 #include "PN532_I2C.h"
 
-#define IRQ   (2)
-#define RST (7)  // Not connected by default on the NFC Shield
+const int IRQ = 7;
+const int RST = 0xff;  // Not connected by default on the NFC Shield
+// tied with CPU RESET
 
 PN532 nfc(PN532::I2C_ADDRESS, IRQ, RST);
 byte respbuff[80];
@@ -18,25 +19,28 @@ void setup() {
 
   if ( nfc.GetFirmwareVersion() 
     && nfc.getCommandResponse(respbuff) ) {
-    Serial.print("PN53x IC version '"); 
+    Serial.print("IC version PN53'"); 
     Serial.print((char) respbuff[0]); 
     Serial.print("', firmware ver. "); 
     Serial.print(respbuff[1]); 
-    Serial.print(", rev. "); 
-    Serial.println(respbuff[2]);
-    Serial.print("Support "); 
-    Serial.print((respbuff[3] & 0b001 ? "ISO/IEC 14443 Type A, " :""));
-    Serial.print((respbuff[3] & 0b010 ? "ISO/IEC 14443 Type B, " :""));
-    Serial.print((respbuff[3] & 0b001 ? "ISO 18092, " :""));
-    Serial.println();
+    Serial.print(" rev. "); 
+    Serial.print(respbuff[2]);
+    Serial.print(", supports "); 
+    Serial.print((respbuff[3] & 0b001 ? "Type A, " :""));
+    Serial.print((respbuff[3] & 0b010 ? "Type B, " :""));
+    Serial.print((respbuff[3] & 0b001 ? "ISO 18092 " :""));
+    Serial.println(".");
   } 
   else {
-    Serial.println("Not found PN532.");
+    Serial.println("PN532 not found.");
     while (1);
   }
-  if ( nfc.SAMConfiguration() && (cnt = nfc.getCommandResponse(respbuff)) ) {
-    nfc.printHexString(respbuff, cnt);
-    Serial.println("  SAMConfiguration >>");
+
+  Serial.println("  SAMConfiguration ");
+  if ( nfc.SAMConfiguration() && (0 == nfc.getCommandResponse(respbuff)) ) {
+    Serial.println();
+  } else {
+    Serial.println(" failed.");
   }
   if ( nfc.GetGeneralStatus() && (cnt = nfc.getCommandResponse(respbuff)) ) {
     nfc.printHexString(respbuff, cnt);
@@ -46,10 +50,12 @@ void setup() {
   Serial.print(nfc.getCommandResponse(respbuff));
   Serial.println("  PowerDown >>");
 }
+
 void loop() {
   byte cnt;
   byte payload[] = {
     0x00, 0xff, 0xff, 0x01, 0x00    };
+    
   *((word*) &payload[1]) = (word) 0x00fe;
   if ( nfc.InListPassiveTarget(1,PN532::Type_GenericPassive212kbFeliCa, payload, 5) ) {
     cnt = nfc.getCommandResponse(respbuff);

@@ -9,26 +9,30 @@
 #define ISO14443_H_
 
 //#include <Print.h>
+#include <Printable.h>
 
 //#include "PN532_I2C.h"
-static const byte TypeA = 0x00;
-static const byte TypeF = 0x01;
-static const byte TypeF_212kb = 0x01;
-static const byte TypeF_424kb = 0x02;
-static const byte TypeB = 0x03;
-static const byte TypeJewel = 0x03;
-static const byte Mifare = 0x10;
-static const byte FeliCa212kb = 0x11;
-static const byte FeliCa424kb = 0x12;
-static const byte Type_Empty = 0xff;
 
-static const word FELICA_SYSCODE_COMMON = 0x00FE;
-static const word FELICA_SYSCODE_SUICA = 0x0003;
-static const word FELICA_SERVICE_SUICA = 0x090F;
-static const word FELICA_SERVICE_EDY = 0x170F;
-static const word FELICA_SERVICE_FCF = 0x1a8b;
+struct ISO14443 : public Printable {
+	static const byte TypeA = 0x00;
+	static const byte TypeF = 0x01;
+	static const byte TypeF_212kb = 0x01;
+	static const byte TypeF_424kb = 0x02;
+	static const byte TypeB = 0x03;
+	static const byte TypeJewel = 0x03;
+	static const byte Mifare = 0x10;
+	static const byte FeliCa212kb = 0x11;
+	static const byte FeliCa424kb = 0x12;
+	static const byte DESFire = 0x20;
+	static const byte Type_Empty = 0xff;
 
-struct ISO14443 {
+	static const word FELICA_SYSCODE_COMMON = 0x00FE;
+	static const word FELICA_SYSCODE_SUICA = 0x0003;
+	static const word FELICA_SERVICE_SUICA = 0x090F;
+	static const word FELICA_SERVICE_EDY = 0x170F;
+	static const word FELICA_SERVICE_FCF = 0x1a8b;
+
+
 	static const byte NFCID_size = 8;
 	//
 	byte type;
@@ -98,7 +102,7 @@ struct ISO14443 {
 		}
 	}
 
-	size_t printOn(Print & pr) {
+	virtual size_t printTo(Print & pr) const {
 		int cnt = 0;
 		switch(type) {
 		case Mifare:
@@ -110,11 +114,16 @@ struct ISO14443 {
 		case FeliCa424kb:
 			cnt += pr.print("FeliCa424kb");
 			break;
+		case DESFire:
+			cnt += pr.print("Mifare DESFire");
+			break;
 		case Type_Empty:
 			cnt += pr.print("Empty");
 			break;
 		default:
-			cnt += pr.print("Unknown");
+			cnt += pr.print("Unknown (");
+			cnt += pr.print(type, DEC);
+			cnt += pr.print(")");
 			break;
 		}
 		for(int i = 0; i < IDLength; i++) {

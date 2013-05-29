@@ -7,7 +7,7 @@
 
 #include "Wire.h"
 #include "PN532_I2C.h"
-
+#include "M41T62.h"
 #include "KeyID.h"
 
 enum PINS {
@@ -26,6 +26,9 @@ SerialRAM fram(CS_FRAM);
 
 //void twi_setup();
 PN532 nfc(PN532::I2C_ADDRESS, IRQ_PN532);
+M41T62 rtc;
+
+TextStream serout(Serial);
 
 void setup() {
 	TextStream reader;
@@ -44,12 +47,24 @@ void setup() {
 
 	//TWI
 	Wire.begin();
+	rtc.begin();
+	rtc.update();
+	serout << "RTC time ";
+	serout.print(rtc.time, HEX);
+	serout << ", ";
+	serout.println(0x20000000UL + rtc.cal, HEX);
+	
 	nfc.begin();
     Serial.print("PN53x "); 
 	if ( nfc.GetFirmwareVersion() && nfc.getCommandResponse((byte*)buf) ) {
-		Serial << (char) buf[0] << ", firmware " 
+		serout << (char) buf[0] << ", firmware " 
 				<< int(buf[1]) << '.' << int(buf[2]) 
 				<< " /w types " << int(buf[3]) << TextStream::endl;
+		nfc.SAMConfiguration();
+		if ( (nfc.getCommandResponse((byte*) buf) == 0) and 
+				(nfc.status() == nfc.RESP_RECEIVED) )
+			serout << "SAM in normal mode, use P70_IRQ." << serout.endl;
+		nfc.PowerDown(0xff);
 	} else {
 		Serial.println(" failed.");
 	}
