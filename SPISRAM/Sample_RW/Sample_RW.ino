@@ -19,7 +19,7 @@ char buffer[128];
 
 void setup() {
   
-  Serial.begin(38400);
+  Serial.begin(115200);
   
   SPI.begin();
   myRAM.begin();
@@ -86,6 +86,6 @@ void loop()
   }
   Serial.print("error count = ");
   Serial.println(err);
-  delay(1000);
+  delay(3000);
 }
 
