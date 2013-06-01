@@ -19,7 +19,7 @@ char buffer[128];
 
 void setup() {
   
-  Serial.begin(115200);
+  Serial.begin(19200);
   
   SPI.begin();
   myRAM.begin();
@@ -34,12 +34,12 @@ void setup() {
   myRAM.write(5,'-');
 
   Serial.println("Byte read...");
-  Serial.println((char)myRAM.read(0));
-  Serial.println((char)myRAM.read(1));
-  Serial.println((char)myRAM.read(2));
-  Serial.println((char)myRAM.read(3));
-  Serial.println((char)myRAM.read(4));
-  Serial.println((char)myRAM.read(5));
+  Serial.print((char)myRAM.read(0));
+  Serial.print((char)myRAM.read(1));
+  Serial.print((char)myRAM.read(2));
+  Serial.print((char)myRAM.read(3));
+  Serial.print((char)myRAM.read(4));
+  Serial.print((char)myRAM.read(5));
 
   Serial.println("\nByte write...");
   myRAM.write(0x7FFC,'W');
@@ -51,13 +51,13 @@ void setup() {
   myRAM.write(0x8002,'!');
 
   Serial.println("Byte read...");
-  Serial.println((char)myRAM.read(0x7FFC));
-  Serial.println((char)myRAM.read(0x7FFD));
-  Serial.println((char)myRAM.read(0x7FFE));
-  Serial.println((char)myRAM.read(0x7FFF));
-  Serial.println((char)myRAM.read(0x8000));
-  Serial.println((char)myRAM.read(0x8001));
-  Serial.println((char)myRAM.read(0x8002));
+  Serial.print((char)myRAM.read(0x7FFC));
+  Serial.print((char)myRAM.read(0x7FFD));
+  Serial.print((char)myRAM.read(0x7FFE));
+  Serial.print((char)myRAM.read(0x7FFF));
+  Serial.print((char)myRAM.read(0x8000));
+  Serial.print((char)myRAM.read(0x8001));
+  Serial.print((char)myRAM.read(0x8002));
 
   Serial.println("\nseq write...");
   int addr = 0x7F00;
@@ -66,6 +66,8 @@ void setup() {
   Serial.println("seq read...");
   myRAM.read(addr, (byte*)buffer, sizeof(buffer));
   Serial.println( buffer );
+  
+  while (1);
 
 }
 

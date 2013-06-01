@@ -35,38 +35,29 @@ private:
 	static const byte RDSR = 0x05; // Read Status register
 	static const byte WRSR = 0x01; // Write Status register
 
-	// STATUS REGISTER
-	static const byte BYTE_MODE = 0x00;
-	static const byte PAGE_MODE = 0x80;
-	static const byte SEQ_MODE = 0x40;
-
 	void set_access(const byte mode, const long & address) {
 		SPI.transfer(mode);
-		if (_addrbus == BUS_MBits)
+		if (_addrbus == BUS_24BITS)
 			SPI.transfer(address >> 16 & 0xff);
 		SPI.transfer(address >> 8 & 0xff);
 		SPI.transfer(address & 0xff);
 	}
 
-	void writeStatusRegister(byte stat) {
-		SPI.transfer(WRSR);
-		SPI.transfer(stat);
-	}
-
-	byte readStatusRegister() {
-		return SPI.transfer(RDSR);
-	}
-
 public:
+	// MODE REGISTER VALUE
+	static const byte BYTE_MODE = 0x00;
+	static const byte PAGE_MODE = 0x80;
+	static const byte SEQ_MODE = 0x40;
+
 	enum {
-		BUS_WIDTH_23K256 = 16, // 23K256
-		BUS_WIDTH_23K640 = 16,  // 23K640
-		BUS_WIDTH_23LC1024 = 24, // 23A/LC1024
-		BUS_KBits = 16,
-		BUS_MBits = 24
+//		BUS_WIDTH_23K256 = 16, // 23K256
+//		BUS_WIDTH_23K640 = 16,  // 23K640
+//		BUS_WIDTH_23LC1024 = 24, // 23A/LC1024
+		BUS_16BITS = 16,
+		BUS_24BITS = 24
 	};
 
-	SPISRAM(const byte csPin, const byte addrwidth = BUS_WIDTH_23K256);
+	SPISRAM(const byte csPin, const byte addrwidth = BUS_24BITS);
 
 	void init();
 	inline void begin() {
@@ -74,8 +65,22 @@ public:
 	}
 	inline void setSPIMode();
 
+	void writeMode(byte stat) {
+		select();
+		SPI.transfer(WRSR);
+		SPI.transfer(stat);
+		deselect();
+	}
+
+	byte readMode() {
+		select();
+		SPI.transfer(RDSR);
+		return SPI.transfer(RDSR);
+		deselect();
+	}
+
 	byte read(const long & address);
-	void * read(const long & address, byte *buffer, const long & size);
+	void read(const long & address, byte *buffer, const long & size);
 	void write(const long & address, byte data);
 	void write(const long & address, byte *buffer, const long & size);
 
