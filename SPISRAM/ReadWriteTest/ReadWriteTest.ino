@@ -1,7 +1,7 @@
+#include <string.h>
 #include <SPI.h>
-#include <SPISRAM.h>
-
-#include "avrxcore.h"
+#include <SerialSRAM.h>
+//#include "avrxcore.h"
 
 /*
  SRAM   Arduino
@@ -14,68 +14,60 @@
  7 HOLD <-- 100k ohm -- 3.3V
  8 Vcc  3.3V
  */
-const uint8 SRAM_CS = 8;
 
-SPISRAM myRAM(SRAM_CS, SPISRAM::BUS_24BITS); // CS pin
-uint8 buffer[256];
+SerialSRAM myRAM(8); // CS pin
+uint8_t buffer[256];
 
 void setup() {
   char teststr[] = "This royal throne of kings, this scepter'd isle,\n"
-  "This earth of majesty, this seat of Mars,\n"
+  "This earth of majesty, this seat of Mars,"
   "This other Eden, demi-paradise,\n"
   "This fortress built by Nature for herself\n"
   "Against infection and the hand of war,";
   
-  pinMode(4, OUTPUT);
-  digitalWrite(4, HIGH);
-  pinMode(8, OUTPUT);
-  digitalWrite(8, HIGH);
-  pinMode(10, OUTPUT);
-  digitalWrite(10, HIGH);
+  int cs[] = { 4, 7, 10};
+  for(int i = 0; i < 3; i++) {
+    pinMode(cs[i], OUTPUT);
+    digitalWrite(cs[i], HIGH);
+  }
   
-  Serial.begin(19200);
+  Serial.begin(9600);
   
   
   SPI.begin();
   myRAM.begin();
   
+  Serial.print("mode ");
+  Serial.println(myRAM.readMode());
+  
   Serial.println("\nRandom byte read/write...");
 
   long err = 0;
   long n = strlen(teststr);
-  uint32_t addr;
+  uint32_t addr = 0;
+//  myRAM.write(addr, teststr[0]);
+//  myRAM.read(addr);
   for(int i=0; i < n; i++){
     addr = random() & 0x1ffff;
     byte val;
     Serial.print( addr, HEX );
     Serial.print( "\t" );
     Serial.print( teststr[i], HEX );
-    Serial.print( " " );
-    if ( isprint(teststr[i]) )
-      Serial.print( (char) teststr[i] );
     Serial.print( ": " );
     myRAM.write(addr, teststr[i]);
-    val = myRAM.read(addr);
-    Serial.print( val, HEX );
-    Serial.print( " " );
-    if ( isprint(val) )
-      Serial.print( (char) val );
+    Serial.print( myRAM.read(addr), HEX );
     Serial.println();
-    if (val != teststr[i]) err++;
+    if (myRAM.read(addr) != teststr[i]) err++;
   }
   Serial.print("error count = ");
   Serial.print(err);
   Serial.print(" / ");
   Serial.println(n);
-  
-  Serial.print("mode = ");
-  Serial.println(myRAM.readMode(), HEX);
-  Serial.println();
 
   Serial.println();
   Serial.println("\nRandom sequential read/write...");
 
-  memset(buffer, 0x20, 128);
+  memset(buffer, 0xff, 128);
   addr = random() & 0x1ffff;
   Serial.print("ADDRESS ");
   Serial.println(addr, HEX);
@@ -91,9 +83,6 @@ void setup() {
   Serial.println("Read after write: ");
   for(int i = 0; i < 128; i++) {
     Serial.print((char) buffer[i]);
-    Serial.print("[");
-    Serial.print((byte)buffer[i], HEX);
-    Serial.print("] ");
   }
   Serial.println();
 }

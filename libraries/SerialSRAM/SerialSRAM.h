@@ -11,16 +11,16 @@
 
  */
 
-#ifndef SPISRAM_H
-#define SPISRAM_H
+#ifndef SERIALSRAM_H
+#define SERIALSRAM_H
 
 #include <Arduino.h>
 #include <SPI.h>
 
-class SPISRAM {
+class SerialSRAM {
 private:
 	const byte _csPin;
-	const byte _addrbus;
+	const byte _buswidth;
 //	volatile long addr;
 //	byte clock_divider;
 //	byte spi_mode;
@@ -35,9 +35,9 @@ private:
 	static const byte RDSR = 0x05; // Read Status register
 	static const byte WRSR = 0x01; // Write Status register
 
-	void set_access(const byte mode, const long & address) {
+	void access(const byte mode, const long & address) {
 		SPI.transfer(mode);
-		if (_addrbus == BUS_24BITS)
+		if (_buswidth == BUS_24BITS)
 			SPI.transfer(address >> 16 & 0xff);
 		SPI.transfer(address >> 8 & 0xff);
 		SPI.transfer(address & 0xff);
@@ -57,13 +57,13 @@ public:
 		BUS_24BITS = 24
 	};
 
-	SPISRAM(const byte csPin, const byte addrwidth = BUS_24BITS);
+	SerialSRAM(const byte csPin, const uint8_t bus = BUS_24BITS);
 
 	void init();
 	inline void begin() {
 		init();
 	}
-	inline void setSPIMode();
+	void setSPIMode();
 
 	void writeMode(byte stat) {
 		select();
@@ -75,7 +75,7 @@ public:
 	byte readMode() {
 		select();
 		SPI.transfer(RDSR);
-		return SPI.transfer(RDSR);
+		return SPI.transfer(0);
 		deselect();
 	}
 
@@ -83,11 +83,24 @@ public:
 	void read(const long & address, byte *buffer, const long & size);
 	void write(const long & address, byte data);
 	void write(const long & address, byte *buffer, const long & size);
-
-	inline void csLow();
-	inline void csHigh();
-	inline void select(void);
-	inline void deselect(void);
+/*
+	size_t read(const long & address, byte *buffer, const long & size) {
+		for(long i = 0; i < size; i++) {
+			*buffer++ = read(address+i);
+		}
+		return size;
+	}
+	size_t write(const long & address, byte *buffer, const long & size) {
+		for(long i = 0; i < size; i++) {
+			write(address+i, *buffer++);
+		}
+		return size;
+	}
+*/
+	void csLow();
+	void csHigh();
+	void select(void);
+	void deselect(void);
 };
 
 #endif

@@ -10,18 +10,14 @@
 #include <Arduino.h>
 #include <SPI.h>
 
-#include "SerialRAM.h"
+#include "SerialFRAM.h"
 
-void SerialRAM::init() {
+void SerialFRAM::init() {
 	pinMode(_cspin, OUTPUT);
 	csHigh();
-	_address = 0;
-//	select();
-//	writeStatusRegister(SEQ_MODE);
-//	deselect();
 }
 
-byte SerialRAM::status(void) {
+byte SerialFRAM::status(void) {
 	byte stat;
 	select();
 	SPI.transfer(FM25_RDSR);
@@ -30,16 +26,14 @@ byte SerialRAM::status(void) {
 	return stat;
 }
 
-byte SerialRAM::status(byte val) {
-	byte stat;
+void SerialFRAM::status(byte val) {
 	select();
 	SPI.transfer(FM25_WRSR);
-	stat = SPI.transfer(val);
+	SPI.transfer(val);
 	deselect();
-	return stat;
 }
 
-int SerialRAM::read(const uint32_t & addr, byte *buffer, const size_t & size) {
+size_t SerialFRAM::readBytes(const uint32_t & addr, char *buffer, size_t size) {
 	select();
 	SPI.transfer(FM25_READ);
 	SPI.transfer( addr >>8 & 0xff);
@@ -47,17 +41,18 @@ int SerialRAM::read(const uint32_t & addr, byte *buffer, const size_t & size) {
 	for (uint16_t i = 0; i < size; i++)
 		*buffer++ = SPI.transfer(0);
 	deselect();
+	_readix = (_readix + size) % (ADDRESS_MAX+1);
 	return size;
 }
 
-int SerialRAM::read(const uint32_t & addr) {
+int SerialFRAM::read(const uint32_t & addr) {
 	int data;
-	read(addr,(byte*) &data, 1);
+	readBytes(addr,(char*) &data, 1);
+	_readix = (_readix++) % (ADDRESS_MAX+1);
 	return data;
 }
 
-
-size_t SerialRAM::write(const uint32_t & addr, byte *buffer, const size_t & size) {
+size_t SerialFRAM::write(const uint32_t & addr, byte *buffer, const size_t size) {
 	select();
 	SPI.transfer(FM25_WREN); // write must be enabled
 	csHigh();
@@ -68,11 +63,13 @@ size_t SerialRAM::write(const uint32_t & addr, byte *buffer, const size_t & size
 	for (uint16_t i = 0; i < size; i++)
 		SPI.transfer(*buffer++);
 	deselect();
+	_writeix = (_writeix + size) % (ADDRESS_MAX+1);
 	return size;
 }
 
-size_t SerialRAM::write(const uint32_t & addr, byte data) {
+size_t SerialFRAM::write(const uint32_t & addr, byte data) {
 	write(addr, &data, 1);
+	_writeix = (_writeix++) % (ADDRESS_MAX+1);
 	return 1;
 }
 

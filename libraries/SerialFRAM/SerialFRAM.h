@@ -11,17 +11,17 @@
 
  */
 
-#ifndef SerialRAM_H
-#define SerialRAM_H
+#ifndef SerialFRAM_H
+#define SerialFRAM_H
 
 #include <Arduino.h>
 #include <SPI.h>
-//#include <inttypes.h>
+#include <Stream.h>
 
-class SerialRAM {
+class SerialFRAM : public Stream {
 private:
-	uint32_t _address;
 	const byte _cspin;
+	uint32_t _readix, _writeix;
 
 // Op-codes
 	enum OPCODE {
@@ -41,11 +41,11 @@ private:
 	};
 
 public:
-	static const uint32_t ADDRESS_MAX = 0x8000;
+	static const uint32_t ADDRESS_MAX = 0x8000 - 1;
 
 public:
 
-	SerialRAM(const byte cs) : _cspin(cs) {}
+	SerialFRAM(const byte cs) : _cspin(cs), _readix(0), _writeix(0) {}
 
 	void setSPIMode(void) {
 		SPI.setBitOrder(MSBFIRST);
@@ -56,20 +56,22 @@ public:
 	void init();
 	inline void begin() { init(); }
 	byte status();
-	byte status(byte val);
+	void status(byte val);
 
-	int read(const uint32_t & addr, byte *buffer, const size_t & size);
 	int read(const uint32_t & addr);
-	int read() { return read(_address++); }
-	size_t write(const uint32_t & address, byte *buffer, const size_t & size);
+	size_t readBytes(const uint32_t & addr, char *buffer, size_t length);
+	size_t write(const uint32_t & address, byte *buffer, const size_t size);
 	size_t write(const uint32_t & address, byte data);
-	size_t write(byte data) { return write(_address++, data); }
-	size_t write(byte * dataarray, const size_t & sz) {
-		size_t n = write(_address, dataarray, sz);
-		_address += sz;
-		return n;
-	}
 
+	void address(const uint32_t addr) { _readix = addr; _writeix = addr; }
+	int read() { return read(_readix); }
+	size_t readBytes(char *buffer, size_t length) { return readBytes(_readix, buffer, length); }
+	size_t write(const byte d) { return write(_writeix, d); }
+	size_t write(byte * data, size_t n) { return write(_writeix, data, n); }
+
+	virtual void flush() {};
+	int available() { return 1; }
+	int peek() { int c = read(); _readix--; return c; }
 
 	inline void csLow() { digitalWrite(_cspin, LOW); }
 	inline void csHigh() { digitalWrite(_cspin, HIGH); }
