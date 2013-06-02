@@ -1,6 +1,8 @@
 #include <SPI.h>
 #include <SPISRAM.h>
 
+#include "avrxcore.h"
+
 /*
  SRAM   Arduino
  1 CS   10(CS)
@@ -12,10 +14,10 @@
  7 HOLD <-- 100k ohm -- 3.3V
  8 Vcc  3.3V
  */
-const int SRAM_CS = 10;
+const uint8 SRAM_CS = 8;
 
 SPISRAM myRAM(SRAM_CS, SPISRAM::BUS_24BITS); // CS pin
-char buffer[256];
+uint8 buffer[256];
 
 void setup() {
   char teststr[] = "This royal throne of kings, this scepter'd isle,\n"
@@ -24,7 +26,15 @@ void setup() {
   "This fortress built by Nature for herself\n"
   "Against infection and the hand of war,";
   
+  pinMode(4, OUTPUT);
+  digitalWrite(4, HIGH);
+  pinMode(8, OUTPUT);
+  digitalWrite(8, HIGH);
+  pinMode(10, OUTPUT);
+  digitalWrite(10, HIGH);
+  
   Serial.begin(19200);
+  
   
   SPI.begin();
   myRAM.begin();
@@ -69,19 +79,10 @@ void setup() {
   addr = random() & 0x1ffff;
   Serial.print("ADDRESS ");
   Serial.println(addr, HEX);
+  
   myRAM.write(addr, (byte*)teststr, 128);
-  /*
-  for(int i = 0; i < 128; i++) {
-    myRAM.write(addr+i, teststr[i]);
-  }
-  */
-
   myRAM.read(addr, (byte*)buffer, 128);
-  /*
-  for(int i = 0; i < 128; i++) {
-    buffer[i] = myRAM.read(addr+i);
-  }
-  */
+
   Serial.println("Original: ");
   for(int i = 0; i < 128; i++) {
     Serial.print((char)teststr[i]);
