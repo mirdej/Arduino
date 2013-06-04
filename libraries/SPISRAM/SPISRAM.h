@@ -35,61 +35,44 @@ enum {
 	BUSWIDTH_24BITS = 24
 };
 
-struct SPISRAM {
+class SPISRAM {
 	// Microchip 23LC1024, 23LCV1024, 24K256, etc.
-	uint8_t opmode;
-	uint8_t rwmode;
-	uint32_t address; // rw command, address bit 23 - 16, 15 - 8. 7 - 0
 	uint8_t CSpin; // chip select I/O address
+	uint8_t busWidth;
 
-	void writeSR(uint8_t m) {
-		SPI.transfer(WRSR);
-		SPI.transfer(m);
-	}
-
-	uint8_t readSR(void) {
-		SPI.transfer(RDSR);
-		return SPI.transfer(0xaa); // aa dummy
-	}
 public:
 
-	SPISRAM(uint8_t cs) : CSpin(cs) {
-		opmode = SEQ_MODE;
-		rwmode = READ;
-		address = 0;
-	}
+	SPISRAM(uint8_t cs, uint8_t bw = BUSWIDTH_24BITS) : CSpin(cs), busWidth(bw) { }
 
-	void init() {
-		pinMode(CSpin, OUTPUT);
-		deselect(); // ensure
-	}
+	void init();
 	inline void begin() { init(); }
 
-	void access(uint8_t rw, uint32_t addr) {
-		rwmode = rw;
-		address = addr;
-		SPI.transfer(rwmode);
-		SPI.transfer(static_cast<uint8_t>(address>>16));
-		SPI.transfer(static_cast<uint8_t>(address>>8));
-		SPI.transfer(static_cast<uint8_t>(address));
-	}
+	uint8_t read(const uint32_t addr) ;
+	void write(const uint32_t addr, uint8_t w) ;
 
-	void OPstatus(uint8_t op) {
-		opmode = op;
-		writeSR(opmode);
-	}
+	size_t readBytes(const uint32_t addr, uint8_t * data, size_t num);
+	size_t writeBytes(const uint32_t addr, uint8_t * data, size_t num);
 
+/*
 	uint8_t OPstatus() {
-		opmode = readSR();
+		select();
+		SPI.transfer(RDSR);
+		opmode = SPI.transfer(0);
+		deselect();
 		return opmode;
 	}
-
+*/
 	void select() {
+		SPI.setDataMode(SPI_MODE0);
+		SPI.setBitOrder(MSBFIRST);
+		SPI.setClockDivider(SPI_CLOCK_DIV4);
 		digitalWrite(CSpin, LOW);
+		//PORTB &= ~(1<<PORTB2);
 	}
 
 	void deselect() {
 		digitalWrite(CSpin, HIGH);
+		//PORTB |= (1<<PORTB2);
 	}
 };
 

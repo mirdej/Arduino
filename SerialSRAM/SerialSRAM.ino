@@ -29,10 +29,10 @@ void SpiRAMWrite8(uint16_t address, uint8_t data_byte) {
   PORTB |= (1<<PORTB2); //set SPI_SS high
 }
  
- char test[] = "This royal throne of kings, this sceptred isle,"
-"This earth of majesty, this seat of Mars,"
-"This other Eden, demi-paradise;"
-"This fortress, built by nature for herself,"
+ char test[] = "This royal throne of kings, this sceptre'd isle,\n"
+"This earth of majesty, this seat of Mars,\n"
+"This other Eden, demi-paradise;\n"
+"This fortress, built by nature for herself,\n"
 "Against infection, and the hand of war;";
 
 void setup(void) {
@@ -40,15 +40,21 @@ void setup(void) {
   uint8_t i;
  
   Serial.begin(9600);
+  Serial.println("\n\nstarts.\n");
   SPI.begin();
-  for (addr=0; addr<64; addr++) {
-    SpiRAMWrite8(addr, (uint8_t)test[addr]);
-    Serial.print("Addr: ");
-    Serial.print(addr);
-    i = SpiRAMRead8(addr);
-    Serial.print(" | Read: ");
-    Serial.println((char)i);
+
+  randomSeed(millis());
+  long address = random(0, 0x1ffff);
+  Serial.print("address ");
+  Serial.println(address, HEX);
+  for (addr=0; addr<128; addr++) {
+    SpiRAMWrite8(address+addr, (uint8_t)test[addr]);
   }
+  for (addr=0; addr<128; addr++) {
+    i = SpiRAMRead8(address+addr);
+    Serial.print((char)i);
+  }
+  Serial.println();
 }
  
 void loop() {

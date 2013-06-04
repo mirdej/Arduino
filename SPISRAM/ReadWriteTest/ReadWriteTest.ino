@@ -38,7 +38,7 @@ void setup() {
   myRAM.begin();
   
  // myRAM.writeMode(myRAM.SEQ_MODE);
-  Serial.println((myRAM.readMode() == myRAM.BYTE_MODE ? "byte mode" : "sequential mode"));
+//  Serial.println((myRAM.readMode() == myRAM.BYTE_MODE ? "byte mode" : "sequential mode"));
   
   Serial.println("\nRandom byte read/write...");
 
