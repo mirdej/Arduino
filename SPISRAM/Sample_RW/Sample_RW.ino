@@ -1,5 +1,5 @@
 #include <SPI.h>
-#include <SPISRAM.h>
+#include <SerialSRAM.h>
 
 /*
  SRAM   Arduino
@@ -14,7 +14,7 @@
  */
 const int SRAM_CS = 10;
 
-SPISRAM myRAM(SRAM_CS, SPISRAM::BUS_MBits); // CS pin
+SerialSRAM myRAM(SRAM_CS, SerialSRAM::BUS_24BITS); // CS pin
 char buffer[128];
 
 void setup() {
