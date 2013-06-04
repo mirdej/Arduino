@@ -39,10 +39,16 @@ class SPISRAM {
 	// Microchip 23LC1024, 23LCV1024, 24K256, etc.
 	uint8_t CSpin; // chip select I/O address
 	uint8_t busWidth;
+//
+//	volatile uint8_t *out;
+//	uint8_t bit;
 
 public:
 
-	SPISRAM(uint8_t cs, uint8_t bw = BUSWIDTH_24BITS) : CSpin(cs), busWidth(bw) { }
+	SPISRAM(uint8_t cs, uint8_t bw = BUSWIDTH_24BITS) : CSpin(cs), busWidth(bw) {
+//		out = &PORTB;
+//		bit = 1<<0;
+	}
 
 	void init();
 	inline void begin() { init(); }
@@ -65,14 +71,14 @@ public:
 	void select() {
 		SPI.setDataMode(SPI_MODE0);
 		SPI.setBitOrder(MSBFIRST);
-		SPI.setClockDivider(SPI_CLOCK_DIV4);
+		SPI.setClockDivider(SPI_CLOCK_DIV2);
 		digitalWrite(CSpin, LOW);
-		//PORTB &= ~(1<<PORTB2);
+	//	*out &= ~bit;
 	}
 
 	void deselect() {
 		digitalWrite(CSpin, HIGH);
-		//PORTB |= (1<<PORTB2);
+	//	*out |= bit;
 	}
 };
 
