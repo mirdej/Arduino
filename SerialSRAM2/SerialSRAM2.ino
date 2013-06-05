@@ -1,5 +1,6 @@
 #include <SPI.h>
 #include <SPISRAM.h>
+#include "avrxcore.h"
 
 SPISRAM ram(8);
 
@@ -15,12 +16,7 @@ void setup() {
     "Or as a moat defensive to a house, \n"
     "Against the envy of less happier lands,-- \n"
     "This blessed plot, this earth, this realm, this England.";
-
-  int pullups[] = { 
-    4, 7, 8, 10    };
-  for(int i = 0; i < sizeof(pullups); i++) {
-    digitalWrite(i, HIGH);
-  }
+    
 
   Serial.begin(9600);
   Serial.println("Hi.");
@@ -39,7 +35,7 @@ void setup() {
   for (int i = 0; i < strlen(test); i++) {
     ram.write(addr+i, test[i]);
   }
-  for (int i = 0; i < strlen(test); i++) {
+  for (unsigned int i = 0; i < strlen(test); i++) {
     Serial.print((char) ram.read(addr+i));
   }
   Serial.println();
@@ -55,7 +51,7 @@ void setup() {
   Serial.println(buf);
   long sum = 0;
   long swatch = millis();
-  for(long i = 0; i < 0x20000/256; i++) {
+  for(unsigned long i = 0; i < 0x20000/256; i++) {
     ram.writeBytes(addr+i*256, (uint8_t*)test, 256);
     ram.readBytes(addr+i*256, (uint8_t*)buf, 256);
     for(int i = 0; i < 256; i++) {
