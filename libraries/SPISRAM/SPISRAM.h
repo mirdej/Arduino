@@ -52,6 +52,12 @@ public:
 
 	void init();
 	inline void begin() { init(); }
+	uint32_t capacity() {
+		if ( busWidth == BUSWIDTH_24BITS)
+			return 0x20000;
+		else
+			return 0x07fff;
+	}
 
 	uint8_t read(const uint32_t addr) ;
 	void write(const uint32_t addr, uint8_t w) ;

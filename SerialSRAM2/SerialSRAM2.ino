@@ -16,7 +16,7 @@ void setup() {
     "Or as a moat defensive to a house, \n"
     "Against the envy of less happier lands,-- \n"
     "This blessed plot, this earth, this realm, this England.";
-    
+  long counter;
 
   Serial.begin(9600);
   Serial.println("Hi.");
@@ -35,9 +35,16 @@ void setup() {
   for (int i = 0; i < strlen(test); i++) {
     ram.write(addr+i, test[i]);
   }
+  counter = 0;
   for (unsigned int i = 0; i < strlen(test); i++) {
-    Serial.print((char) ram.read(addr+i));
+    char c = ram.read(addr+i);
+    Serial.print(c);
+    if ( test[i] != c )
+      counter++;
   }
+  Serial.println();
+  Serial.print("miss matches ");
+  Serial.println(counter);
   Serial.println();
 
   char buf[256];
@@ -49,14 +56,14 @@ void setup() {
   ram.readBytes(addr, (uint8_t*)buf, 256);
   buf[256] = 0;
   Serial.println(buf);
-  long sum = 0;
   long swatch = millis();
+  counter = 0;
   for(unsigned long i = 0; i < 0x20000/256; i++) {
     ram.writeBytes(addr+i*256, (uint8_t*)test, 256);
     ram.readBytes(addr+i*256, (uint8_t*)buf, 256);
     for(int i = 0; i < 256; i++) {
       if ( test[i] != buf[i] )
-        sum++;
+        counter++;
     }
     if ( (i & 0x7f) == 0 ) {
      Serial.print(i*256);
@@ -65,8 +72,8 @@ void setup() {
   }
   Serial.println();
   Serial.print(millis() - swatch);
-  Serial.print(" msec., errors = ");
-  Serial.println(sum);
+  Serial.print(" msecs., miss match errors = ");
+  Serial.println(counter);
 }
 
 void loop() {
