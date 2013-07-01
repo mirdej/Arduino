@@ -5,7 +5,6 @@
  * Manages communication with SCP1000 barometric pressure & temperature sensor
  *
  */
-#include "WProgram.h"
 #include "SPI.h"
 #include "SCP1000D01.h"
 

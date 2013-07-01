@@ -135,16 +135,16 @@ void DS1307::stop(void)
 {
 	// set the ClockHalt bit high to stop the rtc
 	// this bit is part of the seconds byte
-    uint8_t r;
-	readRegisters((uint8_t) DS1307_SEC, &r, 1);
+    uint8_t r = readRegister((uint8_t) DS1307_SEC);
 	r |= DS1307_CLOCKHALT;
-    writeRegisters(DS1307_SEC, &r, 1);
+    writeRegister(DS1307_SEC, r);
 }
 
 void DS1307::start(void)
 {
 	// unset the ClockHalt bit to start the rtc
 	// TODO : preserve existing seconds
-    uint8_t r = 0;
-	writeRegisters(DS1307_SEC, &r, 1);
+    uint8_t r = readRegister(DS1307_SEC);
+    if ( r & DS1307_CLOCKHALT )
+    	writeRegister(DS1307_SEC, r & ~DS1307_CLOCKHALT);
 }

@@ -18,11 +18,13 @@ extern "C" {
   #include <stdlib.h>
   #include <math.h>
 
-  // Wiring Core Includes
-//  #undef abs
-  #include "WConstants.h"
-//#include <WProgram.h>
 }
+
+#if ARDUINO < 100
+#include <WProgram.h>
+#else
+#include "Arduino.h"
+#endif
 
 #include "Sensirion.h"
 
@@ -128,7 +130,7 @@ uint8_t Sensirion::measure(int * temp, int * humid) {
 	 */
 	
 	*temp =  - 4010 /* 4.01 @ 5V */ + /* 0.01 * */ tticks;
-			//from ticks [14bit] to temperature [°C]
+			//from ticks [14bit] to temperature [ï¿½C]
 	hlong = hticks;
 	hlong = -400 /* -4.0 */ + 4.05 /* 0.0405 */ * hlong
 				-0.28672 /* -2.8000E-6 * 100 * 1024 */ * (sq(hlong) >> 10);
@@ -326,11 +328,11 @@ uint8_t Sensirion::softReset(void)
  * Helper Functions
  ******************************************************************************/
 
-// Calculates temperature [°C] and humidity [%RH] 
+// Calculates temperature [ï¿½C] and humidity [%RH] 
 // Input :  humidity    [Ticks] (12 bit) 
 //          temperature [Ticks] (14 bit)
 // Output:  humidity    [%RH]
-//          temperature [°C]
+//          temperature [ï¿½C]
 void Sensirion::extractValues(float *p_humidity ,float *p_temperature)
 { 
   const float C1= -4.0;             // for 12 Bit
@@ -343,21 +345,21 @@ void Sensirion::extractValues(float *p_humidity ,float *p_temperature)
   float t = *p_temperature;         // t:       Temperature [Ticks] 14 Bit
   float rh_lin;                     // rh_lin:  Humidity linear
   float rh_true;                    // rh_true: Temperature compensated humidity
-  float t_C;                        // t_C   :  Temperature [°C]
+  float t_C;                        // t_C   :  Temperature [ï¿½C]
 
-  t_C = t * 0.01 - 40;              //calc. temperature from ticks to [°C]
+  t_C = t * 0.01 - 40;              //calc. temperature from ticks to [ï¿½C]
   rh_lin = C3*rh*rh + C2*rh + C1;   //calc. humidity from ticks to [%RH]
   rh_true = (t_C-25)*(T1+T2*rh)+rh_lin; //calc. temperature compensated humidity [%RH]
   if (rh_true > 100) rh_true=100;   //cut if the value is outside of
   if (rh_true < 0.1) rh_true=0.1;   //the physical possible range
 
-  *p_temperature = t_C;             //return temperature [°C]
+  *p_temperature = t_C;             //return temperature [ï¿½C]
   *p_humidity = rh_true;            //return humidity[%RH]
 }
 
 // Calculates dew point
-// Input:   humidity [%RH], temperature [°C]
-// Output:  dew point [°C]
+// Input:   humidity [%RH], temperature [ï¿½C]
+// Output:  dew point [ï¿½C]
 float Sensirion::getDewpoint(float h, float t)
 { 
   float logEx, dew_point;

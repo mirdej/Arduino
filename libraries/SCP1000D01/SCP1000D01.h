@@ -8,8 +8,11 @@
 #ifndef SCP1000D01_h
 #define SCP1000D01_h
 
+#if ARDUINO < 100
 #include "WProgram.h"
-
+#else
+#include "Arduino.h"
+#endif
 
 class SCP1000
 {

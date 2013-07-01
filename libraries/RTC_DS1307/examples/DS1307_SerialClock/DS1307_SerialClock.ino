@@ -77,9 +77,9 @@ void loop() {
   if ( rtc.time != clockval ) {
     clockval = rtc.time;
     rtc.updateCalendar();
-    Serial.print( rtc.timeString((char*) buf) );
+    Serial.print( rtc.time, HEX );
     Serial.print(" ");
-    Serial.print( rtc.calendarString((char*) buf) );
+    Serial.print( rtc.cal, HEX);
     Serial.print(" ");
     Serial.print( rtc.copyNameOfDay((char*) buf, rtc.dayOfWeek()) );
     Serial.println();
