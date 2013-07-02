@@ -3,8 +3,8 @@
  */
 
 // ensure this library description is only included once
-#ifndef M41T62_h
-#define M41T62_h
+#ifndef M41T6X_h
+#define M41T6X_h
 
 //#include <avr/pgmspace.h>
 
@@ -16,7 +16,7 @@
 #include <Wire.h>
 
 // library interface description
-class M41T62 {
+class M41T6x {
 	// library-accessible "private" interface
 	void readRegisters(byte reg, uint8_t *, byte);
 	void writeRegisters(byte reg, uint8_t *, byte);
@@ -73,7 +73,7 @@ public:
 public:
 	long time, cal;
 
-	M41T62() : time(0), cal(0) {
+	M41T6x() : time(0), cal(0) {
 	}
 
 	void init() {
