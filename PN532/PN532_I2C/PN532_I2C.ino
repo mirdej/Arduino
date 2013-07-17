@@ -5,7 +5,7 @@ const int IRQ = 7;
 const int RST = 0xff;  // Not connected by default on the NFC Shield
 // tied with CPU RESET
 
-PN532 nfc(PN532::I2C_ADDRESS, IRQ, RST);
+PN532 nfc(PN532::I2C_ADDRESS, IRQ, 0xff);
 byte respbuff[80];
 
 void setup() {
@@ -16,25 +16,21 @@ void setup() {
 
   Serial.begin(9600);
   Serial.println("PN532 via I2C Firmware inspection/FeliCa read test.");
-
+  
   if ( nfc.GetFirmwareVersion() 
-    && nfc.getCommandResponse(respbuff) ) {
-    Serial.print("IC version PN53'"); 
-    Serial.print((char) respbuff[0]); 
-    Serial.print("', firmware ver. "); 
-    Serial.print(respbuff[1]); 
-    Serial.print(" rev. "); 
-    Serial.print(respbuff[2]);
-    Serial.print(", supports "); 
-    Serial.print((respbuff[3] & 0b001 ? "Type A, " :""));
-    Serial.print((respbuff[3] & 0b010 ? "Type B, " :""));
-    Serial.print((respbuff[3] & 0b001 ? "ISO 18092 " :""));
-    Serial.println(".");
-  } 
-  else {
-    Serial.println("PN532 not found.");
-    while (1);
-  }
+      && nfc.getCommandResponse(respbuff) ) {
+  Serial.print("IC version PN53'"); 
+  Serial.print((char) respbuff[0]); 
+  Serial.print("', firmware ver. "); 
+  Serial.print(respbuff[1]); 
+  Serial.print(" rev. "); 
+  Serial.print(respbuff[2]);
+  Serial.print(", supports "); 
+  Serial.print((respbuff[3] & 0b001 ? "Type A, " :""));
+  Serial.print((respbuff[3] & 0b010 ? "Type B, " :""));
+  Serial.print((respbuff[3] & 0b001 ? "ISO 18092 " :""));
+  Serial.println(".");
+      }
 
   Serial.println("  SAMConfiguration ");
   if ( nfc.SAMConfiguration() && (0 == nfc.getCommandResponse(respbuff)) ) {

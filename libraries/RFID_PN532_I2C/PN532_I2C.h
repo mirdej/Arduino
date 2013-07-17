@@ -213,15 +213,7 @@ public:
 			const byte * data, const byte datalen);
 
 	byte getCommandResponse(byte * resp, const long & wait = 1000);
-
-	byte getListPassiveTarget(byte * data) {
-		byte count = getCommandResponse(packet);
-		if (!count)
-			return 0;
-		//	count -= 2; // remove checksum and postamble bytes.
-		memcpy(data, packet, count);
-		return packet[0];
-	}
+	byte getListPassiveTarget(byte * data);
 
 	void targetSet(const byte cardtype, const byte * uid, const byte uidLen);
 	void targetClear();

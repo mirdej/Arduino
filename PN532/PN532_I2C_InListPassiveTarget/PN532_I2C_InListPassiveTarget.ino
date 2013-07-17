@@ -3,7 +3,7 @@
 #include "ISO14443.h"
 #include "TextStream.h"
 
-const int IRQ = 17;
+const int IRQ = 2;
 const int RST = 0xff;  // Not connected by default on the NFC Shield
 // tied with CPU RESET
 

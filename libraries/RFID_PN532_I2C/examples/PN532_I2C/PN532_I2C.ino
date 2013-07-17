@@ -1,8 +1,10 @@
 #include <Wire.h>
 #include "PN532_I2C.h"
 
-#define IRQ   (17)
-#define RST (0xff)  // Not connected by default on the NFC Shield
+#define IRQ   (17)	// On the Adafruit shield this output port is connected to d2.
+#define RST (0xff)  // Adafruit board & shield has no default assignment.
+					// Set the digital pin number to reset PN532 manually in program. 
+					// Usually connecting to CPU reset pin may be sufficient. 
 
 PN532 nfc(PN532::I2C_ADDRESS, IRQ, RST);
 byte respbuff[80];
@@ -34,10 +36,9 @@ void setup() {
     Serial.println("Not found PN532.");
     while (1);
   }
-  if ( nfc.SAMConfiguration() && (cnt = nfc.getCommandResponse(respbuff)) ) {
-    nfc.printHexString(respbuff, cnt);
-    Serial.println("  SAMConfiguration >>");
-  }
+  nfc.SAMConfiguration();
+  if ((nfc.getCommandResponse((byte*) respbuff) == 0) and (nfc.status() == nfc.RESP_RECEIVED))
+    Serial.println("  SAMConfiguration: in normal mode, will use P70_IRQ. >>");
   if ( nfc.GetGeneralStatus() && (cnt = nfc.getCommandResponse(respbuff)) ) {
     nfc.printHexString(respbuff, cnt);
     Serial.println("  GetGeneralState >>");
@@ -67,5 +68,6 @@ void loop() {
     }
   }
   delay(1000);
+  Serial.println('.');
 }
 
