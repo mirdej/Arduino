@@ -187,7 +187,7 @@ public:
 		return WriteRegister(0x02fc, (mode == 0 ? 0x00 : 0x02) ); // p. 12/200, User Manual Rev. 02
 	}
 
-
+/*
 	static const byte BaudrateType_106kbitTypeA = 0x00;
 	static const byte BaudrateType_212kbitFeliCa = 0x01;
 	static const byte BaudrateType_424kbitFeliCa = 0x02;
@@ -197,12 +197,13 @@ public:
 	static const byte Type_GenericPassive212kbFeliCa = 0x01;
 	static const byte Type_GenericPassive424kbFeliCa = 0x02;
 	static const byte Type_PassiveTypeB = 0x03;
+	*/
 	static const byte Type_Mifare = 0x10;
 	static const byte Type_FeliCa212kb = 0x11;
 	static const byte Type_FeliCa424kb = 0x12;
 	static const byte Type_Empty = 0xff;
 
-	byte InListPassiveTarget(const byte maxtg, const byte brty, byte * data, const byte initlen);
+	byte InListPassiveTarget(const byte maxtg, const byte BaudModType, byte * data, const byte initlen);
 	byte InAutoPoll(const byte pollnr, const byte per, const byte * types,
 			const byte typeslen);
 	const byte getAutoPollResponse(byte * respo);

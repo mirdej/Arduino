@@ -61,23 +61,28 @@ void setup() {
 }
 
 void loop() {
-  byte c;
+  int cnt;
   byte polling[] = {
     2,
-    ISO14443::TypeA,
-    ISO14443::TypeF
+    BaudrateType_106kbitTypeA,
+    BaudrateType_212kbitFeliCa
   };
 
   Serial.print("InListPassive: ");
-  Serial.println(nfc.InListPassiveTarget(1,PN532::Type_GenericPassiveTypeA, buff /*dummy*/, 0) );
-  int cnt = nfc.getCommandResponse(buff, 200);
-  Serial.print("response: ");
-  Serial.println(cnt);
-  for(int i = 0; i < cnt; i++) {
-    Serial.print(buff[i], HEX);
-    Serial.print(' ');
+  if ( nfc.InListPassiveTarget(1,BaudrateType_106kbitTypeA, buff /*dummy*/, 0) 
+    && (cnt = nfc.getCommandResponse(buff, 200)) > 0 ) {
+    lastcard.setPassiveTarget(buff+1);
+    Serial.print("response: ");
+    Serial.println(cnt);
+    for(int i = 0; i < cnt; i++) {
+      Serial.print(buff[i], HEX);
+      Serial.print(' ');
+    }
+    Serial.println();
+    Serial.println(lastcard);
+  } else {
+    Serial.println("none.");
   }
-  
   delay(1000);
 
 }
