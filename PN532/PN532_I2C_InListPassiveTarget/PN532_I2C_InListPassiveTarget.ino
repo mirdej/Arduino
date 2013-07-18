@@ -1,7 +1,6 @@
 #include <Wire.h>
 #include "PN532_I2C.h"
 #include "ISO14443.h"
-#include "TextStream.h"
 
 const int IRQ = 2;
 const int RST = 0xff;  // Not connected by default on the NFC Shield
@@ -16,8 +15,6 @@ const byte IizukaKey_b[] = {
   0xBB, 0x63, 0x45, 0x74, 0x55, 0x79, 0x4B };
 const byte factory_a[] = {
   0xaa, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
-
-TextStream ser(Serial);
 
 void setup() {
   byte cnt;
@@ -71,63 +68,18 @@ void loop() {
     ISO14443::TypeF
   };
 
-  if ( (millis() > lastCardDetect + 1000) and 
-    (c = nfc.InAutoPoll(1, 1, polling+1, polling[0])) and
-    (c = nfc.getAutoPollResponse((byte*) buff)) ) {
-    //mon << mon.printArray(tmp, 8) << mon.endl;
-    // NbTg, type1, length1, [Tg, ...]
-    card.set(buff[1], buff+3);
-    ser << "Detected " << card << ser.endl;
-    if ( card != lastcard ) { 
-      lastcard = card;
-      lastCardDetect = millis();
-      if ( card.type == ISO14443::Mifare ) {
-        //tone(4, 1800, 100);
-        Serial.println("Mifare: ");
-          for(int i = 0; i < card.IDLength; i++) {
-            ser << (byte) card.ID[i] << ' ';
-          }
-          ser << ser.endl;
-        nfc.targetSet(0x10, card.ID, card.IDLength);
-        if ( nfc.mifare_AuthenticateBlock(4, IizukaKey_b) ) {
-          Serial.println("Auth Success.");
-          nfc.mifare_ReadDataBlock(4, buff);
-          for(int i = 0; i < 16; i++) {
-            Serial.print(buff[i], HEX);
-            Serial.print(' ');
-          }
-          Serial.println();
-          nfc.mifare_ReadDataBlock(5, buff);
-          for(int i = 0; i < 16; i++) {
-            Serial.print(buff[i], HEX);
-            Serial.print(' ');
-          }
-          Serial.println();
-          nfc.mifare_ReadDataBlock(6, buff);
-          for(int i = 0; i < 16; i++) {
-            Serial.print(buff[i], HEX);
-            Serial.print(' ');
-          }
-          Serial.println();
-        } 
-        else {
-          //tone(4, 1200, 100);
-          Serial.println("Failure.");
-        }
-        Serial.println();
-      }
-    } 
+  Serial.print("InListPassive: ");
+  Serial.println(nfc.InListPassiveTarget(1,PN532::Type_GenericPassiveTypeA, buff /*dummy*/, 0) );
+  int cnt = nfc.getCommandResponse(buff, 200);
+  Serial.print("response: ");
+  Serial.println(cnt);
+  for(int i = 0; i < cnt; i++) {
+    Serial.print(buff[i], HEX);
+    Serial.print(' ');
   }
-  else {
-    card.clear();
-  }
+  
+  delay(1000);
 
 }
-
-
-
-
-
-
 
 

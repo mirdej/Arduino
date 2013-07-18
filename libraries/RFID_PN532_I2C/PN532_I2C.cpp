@@ -8,7 +8,7 @@
 //#include <Wire.h>
 #include "PN532_I2C.h"
 
-//#define PN532DEBUG
+#define PN532DEBUG
 //#define MIFAREDEBUG
 //#define PN532COMM
 //#define FELICADEBUG
@@ -219,9 +219,9 @@ boolean PN532::IRQ_ready(void) {
 	return (digitalRead(pin_irq) == HIGH) && (pin_irq != 0xff);
 }
 
-boolean PN532::IRQ_wait(long timeout) {
-//	Serial.println(timeout);
-	timeout += millis();
+boolean PN532::IRQ_wait(long wmillis) {
+	long timeout;
+	timeout = millis() + wmillis;
 	// Wait for chip to say its ready!
 	if (pin_irq == 0xff) {
 		return false;
@@ -229,12 +229,13 @@ boolean PN532::IRQ_wait(long timeout) {
 	while (digitalRead(pin_irq) == HIGH) {
 		if (timeout < millis()) {
 			comm_status = I2CREADY_TIMEOUT;
-			/*
 			 Serial.print("timeout ");
 			 Serial.print(timeout);
-			 Serial.print(", millis ");
+			 Serial.print(", wmillis ");
+			 Serial.print(wmillis);
+			 Serial.print(", at ");
 			 Serial.println(millis());
-			 */
+
 			return false;
 		}
 		delayMicroseconds(500);
@@ -368,9 +369,14 @@ byte PN532::InAutoPoll(const byte pollnr, const byte period, const byte * types,
 }
 
 byte PN532::getCommandResponse(byte * resp, const long & wmillis) {
-	if (!IRQ_wait(wmillis))
+	if (!IRQ_wait(wmillis)) {
+#ifdef PN532DEBUG
+		Serial.println("IRQ wail expired.");
+		Serial.print("Couldn't wait ");
+		Serial.println(wmillis);
+#endif
 		return 0;
-
+	}
 	comm_status = REQUEST_RECEIVE;
 	byte count = receivepacket();
 #ifdef PN532COMM
