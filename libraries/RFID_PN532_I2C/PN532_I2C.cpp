@@ -8,7 +8,7 @@
 //#include <Wire.h>
 #include "PN532_I2C.h"
 
-#define PN532DEBUG
+//#define PN532DEBUG
 //#define MIFAREDEBUG
 //#define PN532COMM
 //#define FELICADEBUG
@@ -229,13 +229,14 @@ boolean PN532::IRQ_wait(long wmillis) {
 	while (digitalRead(pin_irq) == HIGH) {
 		if (timeout < millis()) {
 			comm_status = I2CREADY_TIMEOUT;
-			 Serial.print("timeout ");
-			 Serial.print(timeout);
-			 Serial.print(", wmillis ");
-			 Serial.print(wmillis);
-			 Serial.print(", at ");
-			 Serial.println(millis());
-
+#ifdef PN532DEBUG
+			Serial.print("timeout ");
+			Serial.print(timeout);
+			Serial.print(", wmillis ");
+			Serial.print(wmillis);
+			Serial.print(", at ");
+			Serial.println(millis());
+#endif
 			return false;
 		}
 		delayMicroseconds(500);
@@ -400,21 +401,27 @@ byte PN532::getCommandResponse(byte * resp, const long & wmillis) {
 
 const byte PN532::getAutoPollResponse(byte * respo) {
 	byte cnt;
-	if (!getCommandResponse(respo))
+	if (!getCommandResponse(respo)) {
+		comm_status = RESP_FAILED;
 		return 0;
-	if (respo[0]) {
+	}
+	comm_status = RESP_RECEIVED;
+	cnt = respo[0];
+	if (cnt) {
 		switch (respo[1]) {
 		case Type_FeliCa212kb:
 			targetSet(respo[1], respo + 3 + 3, 8);
+			memmove(respo, respo+3, respo[2]);
 			break;
 		case Type_Mifare:
 			targetSet(respo[1], respo + 3 + 5, respo[3 + 4]);
+			memmove(respo, respo+3, respo[2]);
 			break;
 		}
 	} else {
 		targetClear();
 	}
-	return respo[0];
+	return cnt;
 }
 
 byte PN532::getListPassiveTarget(byte * data) {

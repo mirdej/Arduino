@@ -62,29 +62,58 @@ void setup() {
 
 void loop() {
   int cnt;
+  boolean detected = false;
   byte polling[] = {
     2,
     BaudrateType_106kbitTypeA,
     BaudrateType_212kbitFeliCa
   };
 
-  Serial.print("InListPassive: ");
-  if ( nfc.InListPassiveTarget(1,BaudrateType_106kbitTypeA, buff /*dummy*/, 0) 
-    && (cnt = nfc.getCommandResponse(buff, 200)) > 0 ) {
-    lastcard.setPassiveTarget(buff+1);
-    Serial.print("response: ");
-    Serial.println(cnt);
-    for(int i = 0; i < cnt; i++) {
-      Serial.print(buff[i], HEX);
-      Serial.print(' ');
+
+  card = lastcard;
+  if (millis() > lastCardDetect + 1000) {
+    if ( nfc.InAutoPoll(1, 1, polling+1, polling[0]) and 
+      (cnt = nfc.getAutoPollResponse((byte*) buff) ) ) {
+      for(int i = 0; i < 16; i++) {
+        Serial.print(buff[i], HEX);
+        Serial.print(' ');
+      }
+      Serial.println();
+      Serial.println(cnt);
+      
+      card.set(buff[1], buff+3);
+      Serial.print("InAutoPoll ");
+      Serial.println(card);
+      lastcard = card;
+      lastCardDetect = millis();
+    }
+    delay(1000);
+  }
+  
+  //
+  detected = true;
+  if ( detected ) {
+    Serial.print("InListPassive: ");
+    if ( nfc.InListPassiveTarget(1,BaudrateType_106kbitTypeA, buff /*dummy*/, 0) 
+      && (cnt = nfc.getCommandResponse(buff)) > 0 ) {
+      lastcard.setPassiveTarget(buff+1);
+      Serial.print("response: ");
+      Serial.println(cnt);
+      for(int i = 0; i < cnt; i++) {
+        Serial.print(buff[i], HEX);
+        Serial.print(' ');
+      }
+      Serial.println();
+      Serial.println(lastcard);
+      delay(1000);
+    } else {
+      Serial.println(" InListPassiveTarget failed.");
+      delay(1000);
     }
     Serial.println();
-    Serial.println(lastcard);
   } else {
-    Serial.println("none.");
+    delay(2000);
   }
-  delay(1000);
-
 }
 
 

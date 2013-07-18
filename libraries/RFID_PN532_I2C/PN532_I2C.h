@@ -95,8 +95,8 @@ class PN532 {
 	byte receive();
 	byte receivepacket(int n);
 	byte receivepacket();
-	boolean checkACKframe(long timeout = 1000);
-	boolean IRQ_wait(long timeout = 1000);
+	boolean checkACKframe(long timeout = 250);
+	boolean IRQ_wait(long timeout = 250);
 
 	void send_ack();
 	void send_nack();
@@ -161,6 +161,7 @@ public:
 		ERROR_FRAME_RECEIVED,
 		RESP_COMMAND_MISSMATCH,
 		RESP_RECEIVED,
+		RESP_FAILED,
 		CHECKSUMERROR = 0xfa,
 		I2CREADY_TIMEOUT,
 		WRONG_ACK,
@@ -213,7 +214,7 @@ public:
 	byte InDataExchange(const byte Tg, const byte micmd, const byte blkaddr,
 			const byte * data, const byte datalen);
 
-	byte getCommandResponse(byte * resp, const long & wait = 1000);
+	byte getCommandResponse(byte * resp, const long & wait = 250);
 	byte getListPassiveTarget(byte * data);
 
 	void targetSet(const byte cardtype, const byte * uid, const byte uidLen);
