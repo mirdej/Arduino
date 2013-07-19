@@ -11,34 +11,36 @@
 //#include <Print.h>
 #include <Printable.h>
 
-	static const byte BaudrateType_106kbitTypeA = 0x00;
-	static const byte BaudrateType_212kbitFeliCa = 0x01;
-	static const byte BaudrateType_424kbitFeliCa = 0x02;
-	static const byte BaudrateType_106kbitTypeB = 0x03;
-	static const byte BaudrateType_Jewel = 0x04;
+namespace NFC {
+static const byte BaudrateType_106kbitTypeA = 0x00;
+static const byte BaudrateType_212kbitFeliCa = 0x01;
+static const byte BaudrateType_424kbitFeliCa = 0x02;
+static const byte BaudrateType_106kbitTypeB = 0x03;
+static const byte BaudrateType_Jewel = 0x04;
 
-	static const byte Type_GenericPassiveTypeA = 0x00;
-	static const byte Type_GenericPassive212kbFeliCa = 0x01;
-	static const byte Type_GenericPassive424kbFeliCa = 0x02;
-	static const byte Type_PassiveTypeB = 0x03;
-	static const byte Type_Mifare = 0x10;
-	static const byte Type_FeliCa212kb = 0x11;
-	static const byte Type_FeliCa424kb = 0x12;
-	static const byte Type_DESFire = 0x20;
-	static const byte Type_Empty = 0xff;
+static const byte Type_GenericPassiveTypeA = 0x00;
+static const byte Type_GenericPassive212kbFeliCa = 0x01;
+static const byte Type_GenericPassive424kbFeliCa = 0x02;
+static const byte Type_PassiveTypeB = 0x03;
+static const byte Type_Mifare = 0x10;
+static const byte Type_FeliCa212kb = 0x11;
+static const byte Type_FeliCa424kb = 0x12;
+static const byte Type_DESFire = 0x20;
+static const byte Type_Empty = 0xff;
 
 
-	static const word ATQA_MIFARE_CLASSIC1K = 0x0004;
-	static const word ATQA_MIFARE_CLASSIC4K = 0x0002;
-	static const word ATQA_MIFARE_ULTRALIGHT = 0x0044;
-	static const word ATQA_MIFARE_DESFIRE = 0x0344;
-	static const word ATQA_MIFARE_DESFIRE_EV1 = 0x0344;
+static const word ATQA_MIFARE_CLASSIC1K = 0x0004;
+static const word ATQA_MIFARE_CLASSIC4K = 0x0002;
+static const word ATQA_MIFARE_ULTRALIGHT = 0x0044;
+static const word ATQA_MIFARE_DESFIRE = 0x0344;
+static const word ATQA_MIFARE_DESFIRE_EV1 = 0x0344;
 
-	static const word FELICA_SYSCODE_COMMON = 0x00FE;
-	static const word FELICA_SYSCODE_SUICA = 0x0003;
-	static const word FELICA_SERVICE_SUICA = 0x090F;
-	static const word FELICA_SERVICE_EDY = 0x170F;
-	static const word FELICA_SERVICE_FCF = 0x1a8b;
+static const word FELICA_SYSCODE_COMMON = 0x00FE;
+static const word FELICA_SYSCODE_SUICA = 0x0003;
+static const word FELICA_SERVICE_SUICA = 0x090F;
+static const word FELICA_SERVICE_EDY = 0x170F;
+static const word FELICA_SERVICE_FCF = 0x1a8b;
+};
 
 struct ISO14443 : public Printable {
 

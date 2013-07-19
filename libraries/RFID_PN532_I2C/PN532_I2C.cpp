@@ -395,27 +395,31 @@ byte PN532::getCommandResponse(byte * resp, const long & wmillis) {
 	}
 	comm_status = RESP_RECEIVED;
 	count -= 2;
-	memcpy(resp, packet + 2, count);
+	memmove(resp, packet + 2, count);
 	return count;
 }
 
-const byte PN532::getAutoPollResponse(byte * respo) {
-	byte cnt;
-	if (!getCommandResponse(respo)) {
+const byte PN532::getAutoPollResponse(byte * respo, const byte nbtg) {
+	byte cnt, len, type;
+	if (!getCommandResponse(packet)) {
 		comm_status = RESP_FAILED;
 		return 0;
 	}
 	comm_status = RESP_RECEIVED;
-	cnt = respo[0];
-	if (cnt) {
-		switch (respo[1]) {
+
+	cnt = *packet++;
+	for(int i = 0; i < nbtg and i < cnt; i++) {
+		type = *packet++;
+		len = *packet++;
+	}
+	memcpy(respo, packet, len);
+	if (cnt <= nbtg) {
+		switch (type) {
 		case Type_FeliCa212kb:
-			targetSet(respo[1], respo + 3 + 3, 8);
-			memmove(respo, respo+3, respo[2]);
+			targetSet(type, respo+3, 8);
 			break;
 		case Type_Mifare:
-			targetSet(respo[1], respo + 3 + 5, respo[3 + 4]);
-			memmove(respo, respo+3, respo[2]);
+			targetSet(type, respo+5, respo[4]);
 			break;
 		}
 	} else {

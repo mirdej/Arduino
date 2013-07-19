@@ -15,6 +15,7 @@
 #endif
 
 #include <Wire.h>
+#include "ISO14443.h"
 
 class PN532 {
 /*
@@ -207,7 +208,7 @@ public:
 	byte InListPassiveTarget(const byte maxtg, const byte BaudModType, byte * data, const byte initlen);
 	byte InAutoPoll(const byte pollnr, const byte per, const byte * types,
 			const byte typeslen);
-	const byte getAutoPollResponse(byte * respo);
+	const byte getAutoPollResponse(byte * respo, const byte NbTg = 1);
 
 	byte InDataExchange(const byte Tg, const byte * data, const byte length);
 //	byte InDataExchange(const byte Tg, const byte fcmd, const byte * data, const byte len);
