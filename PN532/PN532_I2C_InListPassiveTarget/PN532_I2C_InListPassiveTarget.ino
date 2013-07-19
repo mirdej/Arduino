@@ -29,35 +29,37 @@ void setup() {
     && nfc.getCommandResponse(buff) ) {
     Serial.print("IC version PN53'"); 
     Serial.print((char) buff[0]); 
-    Serial.print("', firmware ver. "); 
+    Serial.print("', Firmware "); 
     Serial.print(buff[1]); 
-    Serial.print(" rev. "); 
+    Serial.print(" rev "); 
     Serial.print(buff[2]);
-    Serial.print(", supports "); 
+    Serial.print(", support types "); 
     Serial.print((buff[3] & 0b001 ? "Type A, " :""));
     Serial.print((buff[3] & 0b010 ? "Type B, " :""));
     Serial.print((buff[3] & 0b001 ? "ISO 18092 " :""));
     Serial.println(".");
   } 
   else {
-    Serial.println("PN532 not found.");
+    Serial.println("PN532 not found. Stop. ");
     while (1);
   }
 
-  Serial.println("  SAMConfiguration ");
+  Serial.println("SAMConfiguration ");
   if ( nfc.SAMConfiguration() && (0 == nfc.getCommandResponse(buff)) ) {
-    Serial.println();
+    Serial.println(" succeeded.");
   } 
   else {
     Serial.println(" failed.");
   }
+  /*
   if ( nfc.GetGeneralStatus() && (cnt = nfc.getCommandResponse(buff)) ) {
     nfc.printHexString(buff, cnt);
     Serial.println("  GetGeneralState >>");
   }
+  */
+  Serial.println("  Going to PowerDown >>");
   nfc.PowerDown(0xff);
   Serial.print(nfc.getCommandResponse(buff));
-  Serial.println("  PowerDown >>");
 }
 
 void loop() {
@@ -65,8 +67,8 @@ void loop() {
   boolean detected = false;
   byte polling[] = {
     2,
-    BaudrateType_106kbitTypeA,
-    BaudrateType_212kbitFeliCa
+    NFC::BaudrateType_106kbitTypeA,
+    NFC::BaudrateType_212kbitFeliCa
   };
 
 
@@ -74,45 +76,37 @@ void loop() {
   if (millis() > lastCardDetect + 1000) {
     if ( nfc.InAutoPoll(1, 1, polling+1, polling[0]) and 
       (cnt = nfc.getAutoPollResponse((byte*) buff) ) ) {
-      for(int i = 0; i < 16; i++) {
-        Serial.print(buff[i], HEX);
-        Serial.print(' ');
-      }
-      Serial.println();
-      Serial.println(cnt);
-      
-      card.set(buff[1], buff+3);
-      Serial.print("InAutoPoll ");
-      Serial.println(card);
-      lastcard = card;
-      lastCardDetect = millis();
-    }
-    delay(1000);
-  }
-  
-  //
-  detected = true;
-  if ( detected ) {
-    Serial.print("InListPassive: ");
-    if ( nfc.InListPassiveTarget(1,BaudrateType_106kbitTypeA, buff /*dummy*/, 0) 
-      && (cnt = nfc.getCommandResponse(buff)) > 0 ) {
-      lastcard.setPassiveTarget(buff+1);
-      Serial.print("response: ");
-      Serial.println(cnt);
+      card.setPassiveTarget(buff);
+      Serial.print("InAutoPoll deteced: ");
+      /*
       for(int i = 0; i < cnt; i++) {
         Serial.print(buff[i], HEX);
         Serial.print(' ');
       }
       Serial.println();
-      Serial.println(lastcard);
-      delay(1000);
+      Serial.println(cnt);
+      */
+      Serial.println(card);
+      lastCardDetect = millis();
     } else {
-      Serial.println(" InListPassiveTarget failed.");
-      delay(1000);
+      delay(500);
     }
-    Serial.println();
-  } else {
-    delay(2000);
+  }
+  
+  if ( card != lastcard ) {
+    lastcard = card;
+    
+    if ( card.atqa == NFC::ATQA_MIFARE_ULTRALIGHT ) {
+      Serial.println("Block ");
+      cnt = nfc.mifare_ReadDataBlock(8, buff);
+      for(int i = 0; i < cnt; i++) {
+        Serial.print(buff[i], HEX);
+        Serial.print(' ');
+      }
+      Serial.println();
+      Serial.println(cnt);
+    }
+    delay(1000);
   }
 }
 

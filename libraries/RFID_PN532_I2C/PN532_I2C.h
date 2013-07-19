@@ -72,9 +72,9 @@ class PN532 {
 
 	static const byte PACKBUFFSIZE = 80;
 //
+	byte i2c_addr;
 	byte pin_irq; // P70_IRQ
 	byte pin_rst;
-	byte i2c_addr;
 	//
 	byte chksum;
 	byte packet[PACKBUFFSIZE];
@@ -208,7 +208,6 @@ public:
 	byte InListPassiveTarget(const byte maxtg, const byte BaudModType, byte * data, const byte initlen);
 	byte InAutoPoll(const byte pollnr, const byte per, const byte * types,
 			const byte typeslen);
-	const byte getAutoPollResponse(byte * respo, const byte NbTg = 1);
 
 	byte InDataExchange(const byte Tg, const byte * data, const byte length);
 //	byte InDataExchange(const byte Tg, const byte fcmd, const byte * data, const byte len);
@@ -216,6 +215,7 @@ public:
 			const byte * data, const byte datalen);
 
 	byte getCommandResponse(byte * resp, const long & wait = 250);
+	byte getAutoPollResponse(byte * respo);
 	byte getListPassiveTarget(byte * data);
 
 	void targetSet(const byte cardtype, const byte * uid, const byte uidLen);

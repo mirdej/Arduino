@@ -121,7 +121,7 @@ byte PN532::receivepacket(int n) {
 	}
 	// preamble
 	if (memcmp(packet, "\x00\x00\xff", 3) != 0
-			|| ((packet[3] + packet[4]) & 0xff != 0)) {
+			|| ((packet[3] + packet[4]) & 0xff) != 0 ) {
 #ifdef PN532DEBUG
 		Serial.println("received illigale preamble.");
 #endif
@@ -171,7 +171,7 @@ byte PN532::receivepacket() {
 	}
 	// preamble
 	if (memcmp(packet, "\x00\x00\xff", 3) != 0
-			|| ((packet[3] + packet[4]) & 0xff != 0)) {
+			|| ((packet[3] + packet[4]) & 0xff) != 0 ) {
 #ifdef PN532DEBUG
 		Serial.println("received illigale preamble.");
 #endif
@@ -220,7 +220,7 @@ boolean PN532::IRQ_ready(void) {
 }
 
 boolean PN532::IRQ_wait(long wmillis) {
-	long timeout;
+	unsigned long timeout;
 	timeout = millis() + wmillis;
 	// Wait for chip to say its ready!
 	if (pin_irq == 0xff) {
@@ -399,33 +399,28 @@ byte PN532::getCommandResponse(byte * resp, const long & wmillis) {
 	return count;
 }
 
-const byte PN532::getAutoPollResponse(byte * respo, const byte nbtg) {
-	byte cnt, len, type;
+byte PN532::getAutoPollResponse(byte * respo) {
 	if (!getCommandResponse(packet)) {
 		comm_status = RESP_FAILED;
 		return 0;
 	}
 	comm_status = RESP_RECEIVED;
 
-	cnt = *packet++;
-	for(int i = 0; i < nbtg and i < cnt; i++) {
-		type = *packet++;
-		len = *packet++;
-	}
-	memcpy(respo, packet, len);
-	if (cnt <= nbtg) {
-		switch (type) {
+	// ignore the tag no. 2 or greater
+	if ( packet[0] > 0 ) { // count
+		memcpy(respo, packet+3, packet[2]); // length
+		switch (packet[1]) { // type
 		case Type_FeliCa212kb:
-			targetSet(type, respo+3, 8);
+			targetSet(Type_FeliCa212kb, respo+3, 8);
 			break;
 		case Type_Mifare:
-			targetSet(type, respo+5, respo[4]);
+			targetSet(Type_Mifare, respo+5, respo[4]);
 			break;
 		}
 	} else {
 		targetClear();
 	}
-	return cnt;
+	return packet[2];
 }
 
 byte PN532::getListPassiveTarget(byte * data) {

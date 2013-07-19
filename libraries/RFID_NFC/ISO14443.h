@@ -29,7 +29,7 @@ static const byte Type_DESFire = 0x20;
 static const byte Type_Empty = 0xff;
 
 
-static const word ATQA_MIFARE_CLASSIC1K = 0x0004;
+static const word ATQA_MIFARE_CLASSIC1K = 0x0004; // SAK = 08
 static const word ATQA_MIFARE_CLASSIC4K = 0x0002;
 static const word ATQA_MIFARE_ULTRALIGHT = 0x0044;
 static const word ATQA_MIFARE_DESFIRE = 0x0344;
@@ -73,7 +73,7 @@ struct ISO14443 : public Printable {
 		type = card.type;
 		IDLength = card.IDLength;
 		switch (type) {
-		case Type_FeliCa212kb: // Felica
+		case NFC::Type_FeliCa212kb: // Felica
 			memcpy(IDm, card.IDm, IDLength);
 			break;
 		default: // Mifare
@@ -102,8 +102,8 @@ struct ISO14443 : public Printable {
 		type = tp;
 		byte len;
 		switch (type) {
-		case Type_FeliCa212kb:
-		case Type_FeliCa424kb:
+		case NFC::Type_FeliCa212kb:
+		case NFC::Type_FeliCa424kb:
 			IDLength = 8;
 			len = raw[1];
 			memcpy(IDm, raw + 3, 8);
@@ -111,7 +111,7 @@ struct ISO14443 : public Printable {
 //			if (len == 20)
 //				memcpy(SysCode, raw + 19, 2);
 			break;
-		case Type_Mifare:
+		case NFC::Type_Mifare:
 		default: // Mifare 106k TypeA
 			IDLength = raw[4];
 			memcpy(UID, raw + 5, IDLength);
@@ -123,17 +123,17 @@ struct ISO14443 : public Printable {
 
 	void setPassiveTarget(const byte * raw) {
 		// raw[0] ... number
-		type = Type_GenericPassiveTypeA;
+		type = NFC::Type_GenericPassiveTypeA;
 		atqa = raw[1]<<8 | raw[2];
 		sak = raw[3];
 		IDLength = raw[4];
 		memcpy(ID, raw+5, IDLength);
 		switch (atqa) {
-		case ATQA_MIFARE_CLASSIC1K:
-		case ATQA_MIFARE_CLASSIC4K:
-		case ATQA_MIFARE_ULTRALIGHT:
-		case ATQA_MIFARE_DESFIRE:
-			type = Type_Mifare;
+		case NFC::ATQA_MIFARE_CLASSIC1K:
+		case NFC::ATQA_MIFARE_CLASSIC4K:
+		case NFC::ATQA_MIFARE_ULTRALIGHT:
+		case NFC::ATQA_MIFARE_DESFIRE:
+			type = NFC::Type_Mifare;
 			break;
 		}
 	}
@@ -141,25 +141,25 @@ struct ISO14443 : public Printable {
 	virtual size_t printTo(Print & pr) const {
 		int cnt = 0;
 		switch(type) {
-		case Type_Mifare:
+		case NFC::Type_Mifare:
 			cnt += pr.print("Mifare");
-			if ( atqa == ATQA_MIFARE_ULTRALIGHT )
+			if ( atqa == NFC::ATQA_MIFARE_ULTRALIGHT )
 				cnt += pr.print(" Ultralight");
-			else if ( atqa == ATQA_MIFARE_CLASSIC1K )
+			else if ( atqa == NFC::ATQA_MIFARE_CLASSIC1K )
 				cnt += pr.print(" Classic 1k");
-			else if ( atqa == ATQA_MIFARE_CLASSIC4K )
+			else if ( atqa == NFC::ATQA_MIFARE_CLASSIC4K )
 				cnt += pr.print(" Classic 4k");
 			break;
-		case Type_FeliCa212kb:
+		case NFC::Type_FeliCa212kb:
 			cnt += pr.print("FeliCa212kb");
 			break;
-		case Type_FeliCa424kb:
+		case NFC::Type_FeliCa424kb:
 			cnt += pr.print("FeliCa424kb");
 			break;
-		case Type_DESFire:
+		case NFC::Type_DESFire:
 			cnt += pr.print("Mifare DESFire");
 			break;
-		case Type_Empty:
+		case NFC::Type_Empty:
 			cnt += pr.print("Empty");
 			break;
 		default:
@@ -178,7 +178,7 @@ struct ISO14443 : public Printable {
 	}
 
 	void clear() {
-		type = Type_Empty;
+		type = NFC::Type_Empty;
 		IDLength = 0;
 		memset(ID, 0, 8);
 		atqa = 0;
