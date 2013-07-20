@@ -15,7 +15,6 @@
 #endif
 
 #include <Wire.h>
-#include "ISO14443.h"
 
 class PN532 {
 /*
@@ -96,8 +95,8 @@ class PN532 {
 	byte receive();
 	byte receivepacket(int n);
 	byte receivepacket();
-	boolean checkACKframe(long timeout = 250);
-	boolean IRQ_wait(long timeout = 250);
+	boolean checkACKframe(long timeout = 1000);
+	boolean IRQ_wait(long timeout = 1000);
 
 	void send_ack();
 	void send_nack();
@@ -162,7 +161,6 @@ public:
 		ERROR_FRAME_RECEIVED,
 		RESP_COMMAND_MISSMATCH,
 		RESP_RECEIVED,
-		RESP_FAILED,
 		CHECKSUMERROR = 0xfa,
 		I2CREADY_TIMEOUT,
 		WRONG_ACK,
@@ -189,7 +187,7 @@ public:
 		return WriteRegister(0x02fc, (mode == 0 ? 0x00 : 0x02) ); // p. 12/200, User Manual Rev. 02
 	}
 
-/*
+
 	static const byte BaudrateType_106kbitTypeA = 0x00;
 	static const byte BaudrateType_212kbitFeliCa = 0x01;
 	static const byte BaudrateType_424kbitFeliCa = 0x02;
@@ -199,24 +197,31 @@ public:
 	static const byte Type_GenericPassive212kbFeliCa = 0x01;
 	static const byte Type_GenericPassive424kbFeliCa = 0x02;
 	static const byte Type_PassiveTypeB = 0x03;
-	*/
 	static const byte Type_Mifare = 0x10;
 	static const byte Type_FeliCa212kb = 0x11;
 	static const byte Type_FeliCa424kb = 0x12;
 	static const byte Type_Empty = 0xff;
 
-	byte InListPassiveTarget(const byte maxtg, const byte BaudModType, byte * data, const byte initlen);
+	byte InListPassiveTarget(const byte maxtg, const byte brty, byte * data, const byte initlen);
 	byte InAutoPoll(const byte pollnr, const byte per, const byte * types,
 			const byte typeslen);
-	const byte getAutoPollResponse(byte * respo, const byte NbTg = 1);
+	const byte getAutoPollResponse(byte * respo);
 
 	byte InDataExchange(const byte Tg, const byte * data, const byte length);
 //	byte InDataExchange(const byte Tg, const byte fcmd, const byte * data, const byte len);
 	byte InDataExchange(const byte Tg, const byte micmd, const byte blkaddr,
 			const byte * data, const byte datalen);
 
-	byte getCommandResponse(byte * resp, const long & wait = 250);
-	byte getListPassiveTarget(byte * data);
+	byte getCommandResponse(byte * resp, const long & wait = 1000);
+
+	byte getListPassiveTarget(byte * data) {
+		byte count = getCommandResponse(packet);
+		if (!count)
+			return 0;
+		//	count -= 2; // remove checksum and postamble bytes.
+		memcpy(data, packet, count);
+		return packet[0];
+	}
 
 	void targetSet(const byte cardtype, const byte * uid, const byte uidLen);
 	void targetClear();

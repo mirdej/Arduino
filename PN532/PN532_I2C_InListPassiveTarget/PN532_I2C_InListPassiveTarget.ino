@@ -65,8 +65,8 @@ void loop() {
   boolean detected = false;
   byte polling[] = {
     2,
-    BaudrateType_106kbitTypeA,
-    BaudrateType_212kbitFeliCa
+    ISO14443::TypeA,
+    ISO14443::TypeF
   };
 
 
@@ -92,9 +92,10 @@ void loop() {
   
   //
   detected = true;
+  /*
   if ( detected ) {
     Serial.print("InListPassive: ");
-    if ( nfc.InListPassiveTarget(1,BaudrateType_106kbitTypeA, buff /*dummy*/, 0) 
+    if ( nfc.InListPassiveTarget(1,ISO14443::TypeA, buff, 0) 
       && (cnt = nfc.getCommandResponse(buff)) > 0 ) {
       lastcard.setPassiveTarget(buff+1);
       Serial.print("response: ");
@@ -114,6 +115,7 @@ void loop() {
   } else {
     delay(2000);
   }
+  */
 }
 
 

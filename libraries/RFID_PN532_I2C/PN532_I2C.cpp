@@ -219,9 +219,9 @@ boolean PN532::IRQ_ready(void) {
 	return (digitalRead(pin_irq) == HIGH) && (pin_irq != 0xff);
 }
 
-boolean PN532::IRQ_wait(long wmillis) {
-	long timeout;
-	timeout = millis() + wmillis;
+boolean PN532::IRQ_wait(long timeout) {
+//	Serial.println(timeout);
+	timeout += millis();
 	// Wait for chip to say its ready!
 	if (pin_irq == 0xff) {
 		return false;
@@ -229,14 +229,12 @@ boolean PN532::IRQ_wait(long wmillis) {
 	while (digitalRead(pin_irq) == HIGH) {
 		if (timeout < millis()) {
 			comm_status = I2CREADY_TIMEOUT;
-#ifdef PN532DEBUG
-			Serial.print("timeout ");
-			Serial.print(timeout);
-			Serial.print(", wmillis ");
-			Serial.print(wmillis);
-			Serial.print(", at ");
-			Serial.println(millis());
-#endif
+			/*
+			 Serial.print("timeout ");
+			 Serial.print(timeout);
+			 Serial.print(", millis ");
+			 Serial.println(millis());
+			 */
 			return false;
 		}
 		delayMicroseconds(500);
@@ -370,14 +368,9 @@ byte PN532::InAutoPoll(const byte pollnr, const byte period, const byte * types,
 }
 
 byte PN532::getCommandResponse(byte * resp, const long & wmillis) {
-	if (!IRQ_wait(wmillis)) {
-#ifdef PN532DEBUG
-		Serial.println("IRQ wail expired.");
-		Serial.print("Couldn't wait ");
-		Serial.println(wmillis);
-#endif
+	if (!IRQ_wait(wmillis))
 		return 0;
-	}
+
 	comm_status = REQUEST_RECEIVE;
 	byte count = receivepacket();
 #ifdef PN532COMM
@@ -395,46 +388,27 @@ byte PN532::getCommandResponse(byte * resp, const long & wmillis) {
 	}
 	comm_status = RESP_RECEIVED;
 	count -= 2;
-	memmove(resp, packet + 2, count);
+	memcpy(resp, packet + 2, count);
 	return count;
 }
 
-const byte PN532::getAutoPollResponse(byte * respo, const byte nbtg) {
-	byte cnt, len, type;
-	if (!getCommandResponse(packet)) {
-		comm_status = RESP_FAILED;
+const byte PN532::getAutoPollResponse(byte * respo) {
+	byte cnt;
+	if (!getCommandResponse(respo))
 		return 0;
-	}
-	comm_status = RESP_RECEIVED;
-
-	cnt = *packet++;
-	for(int i = 0; i < nbtg and i < cnt; i++) {
-		type = *packet++;
-		len = *packet++;
-	}
-	memcpy(respo, packet, len);
-	if (cnt <= nbtg) {
-		switch (type) {
+	if (respo[0]) {
+		switch (respo[1]) {
 		case Type_FeliCa212kb:
-			targetSet(type, respo+3, 8);
+			targetSet(respo[1], respo + 3 + 3, 8);
 			break;
 		case Type_Mifare:
-			targetSet(type, respo+5, respo[4]);
+			targetSet(respo[1], respo + 3 + 5, respo[3 + 4]);
 			break;
 		}
 	} else {
 		targetClear();
 	}
-	return cnt;
-}
-
-byte PN532::getListPassiveTarget(byte * data) {
-  byte count = getCommandResponse(packet);
-	if (!count)
-		return 0;
-	//	count -= 2; // remove checksum and postamble bytes.
-	memcpy(data, packet, count);
-	return packet[0];
+	return respo[0];
 }
 
 /*
