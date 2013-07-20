@@ -71,9 +71,9 @@ class PN532 {
 
 	static const byte PACKBUFFSIZE = 80;
 //
-	byte i2c_addr;
 	byte pin_irq; // P70_IRQ
 	byte pin_rst;
+	byte i2c_addr;
 	//
 	byte chksum;
 	byte packet[PACKBUFFSIZE];
@@ -205,17 +205,13 @@ public:
 	byte InListPassiveTarget(const byte maxtg, const byte brty, byte * data, const byte initlen);
 	byte InAutoPoll(const byte pollnr, const byte per, const byte * types,
 			const byte typeslen);
-<<<<<<< HEAD
 	const byte getAutoPollResponse(byte * respo);
-=======
->>>>>>> 724a7e5cb7e4feda098878587bfaf8203e4f1384
 
 	byte InDataExchange(const byte Tg, const byte * data, const byte length);
 //	byte InDataExchange(const byte Tg, const byte fcmd, const byte * data, const byte len);
 	byte InDataExchange(const byte Tg, const byte micmd, const byte blkaddr,
 			const byte * data, const byte datalen);
 
-<<<<<<< HEAD
 	byte getCommandResponse(byte * resp, const long & wait = 1000);
 
 	byte getListPassiveTarget(byte * data) {
@@ -226,11 +222,6 @@ public:
 		memcpy(data, packet, count);
 		return packet[0];
 	}
-=======
-	byte getCommandResponse(byte * resp, const long & wait = 250);
-	byte getAutoPollResponse(byte * respo);
-	byte getListPassiveTarget(byte * data);
->>>>>>> 724a7e5cb7e4feda098878587bfaf8203e4f1384
 
 	void targetSet(const byte cardtype, const byte * uid, const byte uidLen);
 	void targetClear();
