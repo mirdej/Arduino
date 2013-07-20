@@ -121,7 +121,7 @@ byte PN532::receivepacket(int n) {
 	}
 	// preamble
 	if (memcmp(packet, "\x00\x00\xff", 3) != 0
-			|| ((packet[3] + packet[4]) & 0xff != 0)) {
+			|| ((packet[3] + packet[4]) & 0xff) != 0 ) {
 #ifdef PN532DEBUG
 		Serial.println("received illigale preamble.");
 #endif
@@ -171,7 +171,7 @@ byte PN532::receivepacket() {
 	}
 	// preamble
 	if (memcmp(packet, "\x00\x00\xff", 3) != 0
-			|| ((packet[3] + packet[4]) & 0xff != 0)) {
+			|| ((packet[3] + packet[4]) & 0xff) != 0 ) {
 #ifdef PN532DEBUG
 		Serial.println("received illigale preamble.");
 #endif
@@ -219,9 +219,15 @@ boolean PN532::IRQ_ready(void) {
 	return (digitalRead(pin_irq) == HIGH) && (pin_irq != 0xff);
 }
 
+<<<<<<< HEAD
 boolean PN532::IRQ_wait(long timeout) {
 //	Serial.println(timeout);
 	timeout += millis();
+=======
+boolean PN532::IRQ_wait(long wmillis) {
+	unsigned long timeout;
+	timeout = millis() + wmillis;
+>>>>>>> 724a7e5cb7e4feda098878587bfaf8203e4f1384
 	// Wait for chip to say its ready!
 	if (pin_irq == 0xff) {
 		return false;
@@ -392,6 +398,7 @@ byte PN532::getCommandResponse(byte * resp, const long & wmillis) {
 	return count;
 }
 
+<<<<<<< HEAD
 const byte PN532::getAutoPollResponse(byte * respo) {
 	byte cnt;
 	if (!getCommandResponse(respo))
@@ -403,12 +410,43 @@ const byte PN532::getAutoPollResponse(byte * respo) {
 			break;
 		case Type_Mifare:
 			targetSet(respo[1], respo + 3 + 5, respo[3 + 4]);
+=======
+byte PN532::getAutoPollResponse(byte * respo) {
+	if (!getCommandResponse(packet)) {
+		comm_status = RESP_FAILED;
+		return 0;
+	}
+	comm_status = RESP_RECEIVED;
+
+	// ignore the tag no. 2 or greater
+	if ( packet[0] > 0 ) { // count
+		memcpy(respo, packet+3, packet[2]); // length
+		switch (packet[1]) { // type
+		case Type_FeliCa212kb:
+			targetSet(Type_FeliCa212kb, respo+3, 8);
+			break;
+		case Type_Mifare:
+			targetSet(Type_Mifare, respo+5, respo[4]);
+>>>>>>> 724a7e5cb7e4feda098878587bfaf8203e4f1384
 			break;
 		}
 	} else {
 		targetClear();
 	}
+<<<<<<< HEAD
 	return respo[0];
+=======
+	return packet[2];
+}
+
+byte PN532::getListPassiveTarget(byte * data) {
+  byte count = getCommandResponse(packet);
+	if (!count)
+		return 0;
+	//	count -= 2; // remove checksum and postamble bytes.
+	memcpy(data, packet, count);
+	return packet[0];
+>>>>>>> 724a7e5cb7e4feda098878587bfaf8203e4f1384
 }
 
 /*
