@@ -8,7 +8,7 @@
 //#include <Wire.h>
 #include "PN532_I2C.h"
 
-//#define PN532DEBUG
+#define PN532DEBUG
 //#define MIFAREDEBUG
 //#define PN532COMM
 //#define FELICADEBUG

@@ -3,7 +3,7 @@
 #include "ISO14443.h"
 #include "TextStream.h"
 
-const int IRQ = 17;
+const int IRQ = 2;
 const int RST = 0xff;  // Not connected by default on the NFC Shield
 // tied with CPU RESET
 
@@ -67,8 +67,8 @@ void loop() {
   byte c;
   byte polling[] = {
     2,
+    ISO14443::TypeF,
     ISO14443::TypeA,
-    ISO14443::TypeF
   };
 
   if ( (millis() > lastCardDetect + 1000) and 
