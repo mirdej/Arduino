@@ -11,7 +11,7 @@
 //#define PN532DEBUG
 //#define MIFAREDEBUG
 //#define PN532COMM
-//#define FELICADEBUG
+#define FELICADEBUG
 
 PN532::PN532(byte addr, byte irq, byte rst) :
 		i2c_addr(addr), pin_irq(irq), pin_rst(rst) {
@@ -768,10 +768,20 @@ byte PN532::felica_ReadBlocksWithoutEncryption(byte * resp, const word servcode,
 		// pos has been incremented after the last substitution
 		byte count = InCommunicateThru(mess, 15);
 		count = getCommunicateThruResponse(mess);
+		Serial.print("get ");
+		Serial.println(count);
 		if (mess[9] == 0) {
 			byte blocks = mess[11];
 			memcpy(resp + (16 * bno), mess + 12, blocks * 16);
 		} else {
+#ifdef FELICADEBUG
+			for(int i = 0; i < count; i++) {
+				Serial.print(mess[i]>>4&0x0f, HEX);
+				Serial.print(mess[i]&0x0f, HEX);
+				Serial.print(' ');
+			}
+			Serial.println();
+#endif
 			return 0;
 		}
 	}
