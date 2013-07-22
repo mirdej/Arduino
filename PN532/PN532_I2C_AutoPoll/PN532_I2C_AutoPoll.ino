@@ -67,8 +67,8 @@ void loop() {
   byte c;
   byte polling[] = {
     2,
-    ISO14443::TypeA,
-    ISO14443::TypeF
+    NFC::TypeA,
+    NFC::TypeF
   };
 
   if ( (millis() > lastCardDetect + 1000) and 
