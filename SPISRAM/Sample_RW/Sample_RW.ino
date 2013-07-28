@@ -12,7 +12,7 @@
  7 HOLD <-- 100k ohm -- 3.3V
  8 Vcc  3.3V
  */
-const int SRAM_CS = 10;
+const int SRAM_CS = 8;
 
 SerialSRAM myRAM(SRAM_CS, SerialSRAM::BUS_24BITS); // CS pin
 char buffer[128];
