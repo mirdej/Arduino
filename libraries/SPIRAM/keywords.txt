@@ -1,12 +1,13 @@
 #######################################
-# Syntax Coloring Map For SPISRAM
+# Syntax Coloring Map For SerialRAM
 #######################################
 
 #######################################
 # Datatypes (KEYWORD1)
 #######################################
 
-SPISRAM	KEYWORD1
+SerialFRAM	KEYWORD1
+SerialSRAM  KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
